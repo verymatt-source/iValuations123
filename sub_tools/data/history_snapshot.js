@@ -2696,8 +2696,8 @@ window.historySnapshot = [
   },
   {
     "snapshot_date": "2026-04-25",
-    "snapshot_time": "19:26",
-    "timestamp": 1777116373,
+    "snapshot_time": "19:42",
+    "timestamp": 1777117337,
     "key_markets": [
       {
         "id": 506981,
@@ -2721,9 +2721,9 @@ window.historySnapshot = [
         "peg": 1.9055,
         "pb_flag": false,
         "source": "5",
+        "date": "04-24",
         "pb_over_history": 0.4524,
         "pe_over_history": 0.1888,
-        "date": "04-24",
         "star": 2
       },
       {
@@ -2748,9 +2748,9 @@ window.historySnapshot = [
         "peg": 1.7497,
         "pb_flag": false,
         "source": "5",
+        "date": "04-24",
         "pb_over_history": 0.0892,
         "pe_over_history": 0.1244,
-        "date": "04-24",
         "star": 2
       },
       {
@@ -2775,9 +2775,9 @@ window.historySnapshot = [
         "peg": 1.5544,
         "pb_flag": false,
         "source": "5",
+        "date": "04-24",
         "pb_over_history": 0.416,
         "pe_over_history": 0.0868,
-        "date": "04-24",
         "star": 2
       },
       {
@@ -2802,9 +2802,9 @@ window.historySnapshot = [
         "peg": 1.3023,
         "pb_flag": false,
         "source": "5",
+        "date": "04-24",
         "pb_over_history": 0.2032,
         "pe_over_history": 0.1436,
-        "date": "04-24",
         "star": 2
       },
       {
@@ -2829,9 +2829,9 @@ window.historySnapshot = [
         "peg": 1.2129,
         "pb_flag": false,
         "source": "5",
+        "date": "04-24",
         "pb_over_history": 0.3008,
         "pe_over_history": 0.4792,
-        "date": "04-24",
         "star": 2
       },
       {
@@ -2856,9 +2856,9 @@ window.historySnapshot = [
         "peg": 2.8038,
         "pb_flag": false,
         "source": "5",
+        "date": "04-24",
         "pb_over_history": 0.2549,
         "pe_over_history": 0.0974,
-        "date": "04-24",
         "star": 2
       }
     ],
@@ -2915,7 +2915,7 @@ window.historySnapshot = [
         "比例": 0.6034,
         "备注": "目标值即实际值",
         "分组": "全球",
-        "更新时间": "2026-04-25 19:26"
+        "更新时间": "2026-04-25 19:42"
       },
       "中证煤炭PB": {
         "名称": "中证煤炭PB",
