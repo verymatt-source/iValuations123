@@ -4166,8 +4166,8 @@ window.historySnapshot = [
   },
   {
     "snapshot_date": "2026-05-04",
-    "snapshot_time": "09:00",
-    "timestamp": 1777856406,
+    "snapshot_time": "11:24",
+    "timestamp": 1777865073,
     "key_markets": [
       {
         "id": 507446,
@@ -4191,9 +4191,9 @@ window.historySnapshot = [
         "peg": 1.883,
         "pb_flag": false,
         "source": "5",
+        "date": "04-30",
         "pb_over_history": 0.5628,
         "pe_over_history": 0.1732,
-        "date": "04-30",
         "star": 2
       },
       {
@@ -4218,9 +4218,9 @@ window.historySnapshot = [
         "peg": 1.6982,
         "pb_flag": false,
         "source": "5",
+        "date": "04-30",
         "pb_over_history": 0.1848,
         "pe_over_history": 0.1812,
-        "date": "04-30",
         "star": 2
       },
       {
@@ -4245,9 +4245,9 @@ window.historySnapshot = [
         "peg": 1.5896,
         "pb_flag": false,
         "source": "5",
+        "date": "04-30",
         "pb_over_history": 0.4932,
         "pe_over_history": 0.0768,
-        "date": "04-30",
         "star": 2
       },
       {
@@ -4272,9 +4272,9 @@ window.historySnapshot = [
         "peg": 1.3547,
         "pb_flag": false,
         "source": "5",
+        "date": "04-30",
         "pb_over_history": 0.202,
         "pe_over_history": 0.1432,
-        "date": "04-30",
         "star": 2
       },
       {
@@ -4299,9 +4299,9 @@ window.historySnapshot = [
         "peg": 1.2407,
         "pb_flag": false,
         "source": "5",
+        "date": "04-30",
         "pb_over_history": 0.3064,
         "pe_over_history": 0.448,
-        "date": "04-30",
         "star": 2
       },
       {
@@ -4326,9 +4326,9 @@ window.historySnapshot = [
         "peg": 3.0285,
         "pb_flag": false,
         "source": "5",
+        "date": "04-30",
         "pb_over_history": 0.148,
         "pe_over_history": 0.1004,
-        "date": "04-30",
         "star": 2
       }
     ],
@@ -4365,7 +4365,7 @@ window.historySnapshot = [
         "比例": 0.003941176470588324,
         "备注": "",
         "分组": "全球",
-        "更新时间": "2026-05-02 02:58:07"
+        "更新时间": "2026-05-04 10:00:01"
       },
       "Shiller PE": {
         "名称": "Shiller PE",
@@ -4385,7 +4385,7 @@ window.historySnapshot = [
         "比例": 0.7657,
         "备注": "目标值即实际值",
         "分组": "全球",
-        "更新时间": "2026-05-04 09:00"
+        "更新时间": "2026-05-04 11:24"
       },
       "中证煤炭PB": {
         "名称": "中证煤炭PB",
