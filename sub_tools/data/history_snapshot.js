@@ -6861,8 +6861,8 @@ window.historySnapshot = [
   },
   {
     "snapshot_date": "2026-05-19",
-    "snapshot_time": "09:40",
-    "timestamp": 1779154815,
+    "snapshot_time": "10:02",
+    "timestamp": 1779156129,
     "key_markets": [
       {
         "id": 508459,
@@ -6886,9 +6886,9 @@ window.historySnapshot = [
         "peg": 1.564,
         "pb_flag": false,
         "source": "5",
-        "date": "05-18",
         "pb_over_history": 0.6776,
         "pe_over_history": 0.2464,
+        "date": "05-18",
         "star": 2
       },
       {
@@ -6913,9 +6913,9 @@ window.historySnapshot = [
         "peg": 1.6784,
         "pb_flag": false,
         "source": "5",
-        "date": "05-18",
         "pb_over_history": 0.206,
         "pe_over_history": 0.2048,
+        "date": "05-18",
         "star": 2
       },
       {
@@ -6940,9 +6940,9 @@ window.historySnapshot = [
         "peg": 0.9774,
         "pb_flag": false,
         "source": "5",
-        "date": "05-18",
         "pb_over_history": 0.5256,
         "pe_over_history": 0.09,
+        "date": "05-18",
         "star": 2
       },
       {
@@ -6967,9 +6967,9 @@ window.historySnapshot = [
         "peg": 0.7925,
         "pb_flag": false,
         "source": "5",
-        "date": "05-18",
         "pb_over_history": 0.1836,
         "pe_over_history": 0.136,
+        "date": "05-18",
         "star": 2
       },
       {
@@ -6994,9 +6994,9 @@ window.historySnapshot = [
         "peg": 0.7149,
         "pb_flag": false,
         "source": "5",
-        "date": "05-18",
         "pb_over_history": 0.2664,
         "pe_over_history": 0.4116,
+        "date": "05-18",
         "star": 2
       },
       {
@@ -7021,9 +7021,9 @@ window.historySnapshot = [
         "peg": 0.8441,
         "pb_flag": false,
         "source": "5",
-        "date": "05-18",
         "pb_over_history": 0.0979,
         "pe_over_history": 0.0804,
+        "date": "05-18",
         "star": 2
       }
     ],
@@ -7046,8 +7046,8 @@ window.historySnapshot = [
         "名称": "可转债均价",
         "编码": "KZZJJ",
         "目标值": 115,
-        "当前值": 163.3275579268293,
-        "比例": 0.42023963414634163,
+        "当前值": 162.5172408536586,
+        "比例": 0.413193398727466,
         "备注": "",
         "分组": "核心指标",
         "更新时间": "2026-05-19"
@@ -7056,11 +7056,11 @@ window.historySnapshot = [
         "名称": "美元兑人民币",
         "编码": "USDCNY",
         "目标值": 6.8,
-        "当前值": 6.7969,
-        "比例": -0.00045588235294115895,
+        "当前值": 6.7964,
+        "比例": -0.0005294117647058241,
         "备注": "",
         "分组": "全球",
-        "更新时间": "2026-05-19 09:39:52"
+        "更新时间": "2026-05-19 10:01:12"
       },
       "Shiller PE": {
         "名称": "Shiller PE",
@@ -7080,7 +7080,7 @@ window.historySnapshot = [
         "比例": 0.693,
         "备注": "目标值即实际值",
         "分组": "全球",
-        "更新时间": "2026-05-19 09:40"
+        "更新时间": "2026-05-19 10:02"
       },
       "中证煤炭PB": {
         "名称": "中证煤炭PB",
@@ -7090,7 +7090,7 @@ window.historySnapshot = [
         "比例": 0.8,
         "备注": "",
         "分组": "PB类",
-        "更新时间": ""
+        "更新时间": "2026-05-18"
       },
       "证券PB": {
         "名称": "证券PB",
@@ -7100,7 +7100,7 @@ window.historySnapshot = [
         "比例": 0.025000000000000022,
         "备注": "",
         "分组": "PB类",
-        "更新时间": ""
+        "更新时间": "2026-05-18"
       }
     }
   }
