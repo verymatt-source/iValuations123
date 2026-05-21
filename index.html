@@ -712,6 +712,7 @@
                     目标值: window.pjgzbData['目标值'], 当前值: window.pjgzbData['当前值'],
                     比例: window.pjgzbData['比例'], 备注: window.pjgzbData['备注']||'-',
                     分组: window.pjgzbData['分组'], 更新时间: window.pjgzbData['更新时间'],
+                    方向: window.pjgzbData['方向']||'high',
                     valType: 'pct' });
             }
 
@@ -721,6 +722,7 @@
                     目标值: window.kzzData['目标值'], 当前值: window.kzzData['当前值'],
                     比例: window.kzzData['比例'], 备注: window.kzzData['备注']||'-',
                     分组: window.kzzData['分组'], 更新时间: window.kzzData['更新时间'],
+                    方向: window.kzzData['方向']||'high',
                     valType: 'val' });
             }
 
@@ -730,6 +732,7 @@
                     目标值: window.usdcnyData['目标值'], 当前值: window.usdcnyData['当前值'],
                     比例: window.usdcnyData['比例'], 备注: window.usdcnyData['备注']||'-',
                     分组: window.usdcnyData['分组'], 更新时间: window.usdcnyData['更新时间'],
+                    方向: window.usdcnyData['方向']||'high',
                     valType: 'rate' });
             }
 
@@ -739,6 +742,7 @@
                     目标值: window.shillerData['目标值'], 当前值: window.shillerData['当前值'],
                     比例: window.shillerData['比例'], 备注: window.shillerData['备注']||'-',
                     分组: window.shillerData['分组'], 更新时间: window.shillerData['更新时间'],
+                    方向: window.shillerData['方向']||'high',
                     valType: 'val' });
             }
 
@@ -749,6 +753,7 @@
                         目标值: item['目标值'], 当前值: item['当前值'],
                         比例: item['比例'], 备注: item['备注']||'-',
                         分组: item['分组'], 更新时间: item['更新时间'],
+                        方向: item['方向']||'high',
                         valType: 'val' });
                 });
             }
@@ -759,6 +764,7 @@
                     目标值: window.vixData['目标值'], 当前值: window.vixData['当前值'],
                     比例: window.vixData['比例'], 备注: window.vixData['备注']||'-',
                     分组: window.vixData['分组'], 更新时间: window.vixData['更新时间'],
+                    方向: window.vixData['方向']||'high',
                     valType: 'val' });
             }
 
@@ -768,6 +774,7 @@
                     目标值: window.erpData['目标值'], 当前值: window.erpData['当前值'],
                     比例: window.erpData['比例'], 备注: window.erpData['备注']||'-',
                     分组: window.erpData['分组'], 更新时间: window.erpData['更新时间'],
+                    方向: window.erpData['方向']||'high',
                     valType: 'val' });
             }
 
@@ -788,7 +795,9 @@
                 document.getElementById('monitorBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;">暂无数据</td></tr>';
             } else {
                 document.getElementById('monitorBody').innerHTML = rows.map(item => {
-                    const ratio = item['比例'] || 0;
+                    const rawRatio = item['比例'] || 0;
+                    // 方向=low的指标，比例取反后再算颜色和显示（统一：正数=偏贵，负数=便宜）
+                    const ratio = item['方向'] === 'low' ? -rawRatio : rawRatio;
                     const level = getRatioLevel(ratio);
                     const vt = item.valType || 'val';
                     const targetStr = vt==='pct' ? formatPct(item['目标值']) : (vt==='rate' ? formatVal(item['目标值'],4) : formatVal(item['目标值'],2));
@@ -811,10 +820,10 @@
         }
 
         function renderSummaryBar() {
-            // 1. 破净股 (实际值存储在目标值字段)
+            // 1. 破净股 (实际值存储在当前值字段)
             let pjgzbStr = '-';
-            if (window.pjgzbData && window.pjgzbData['目标值'] !== undefined) {
-                pjgzbStr = formatPct(window.pjgzbData['目标值']);
+            if (window.pjgzbData && window.pjgzbData['当前值'] !== undefined) {
+                pjgzbStr = formatPct(window.pjgzbData['当前值']);
             }
 
             // 2. 关键市场 (高估的指数数量/关键市场的总指数数量)
@@ -825,13 +834,13 @@
                 marketStr = formatPct(highCount / keyMarketData.length);
             }
 
-            // 3. VIX & Shiller PE (VIX实际值在目标值，Shiller实际值在当前值)
-            let vixStr = window.vixData && window.vixData['目标值'] !== undefined ? formatVal(window.vixData['目标值']) : '-';
+            // 3. VIX & Shiller PE (实际值都在当前值字段)
+            let vixStr = window.vixData && window.vixData['当前值'] !== undefined ? formatVal(window.vixData['当前值']) : '-';
             let shillerStr = window.shillerData && window.shillerData['当前值'] !== undefined ? formatVal(window.shillerData['当前值']) : '-';
             let vsStr = `${vixStr} & ${shillerStr}`;
 
-            // 4. ERP股权风险溢价（实际值在目标值字段，同破净股占比逻辑）
-            let erpStr = window.erpData && window.erpData['目标值'] !== undefined ? window.erpData['目标值'].toFixed(2) + '%' : '-';
+            // 4. ERP股权风险溢价（实际值在当前值字段）
+            let erpStr = window.erpData && window.erpData['当前值'] !== undefined ? window.erpData['当前值'].toFixed(2) + '%' : '-';
 
             document.getElementById('summaryBar').innerHTML = `
                 <div class="stat">
