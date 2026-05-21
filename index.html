@@ -489,6 +489,7 @@
     <script src="sub_tools/data/legulegu_data.js"></script>
     <script src="sub_tools/data/shiller_data.js"></script>
     <script src="sub_tools/data/vix_data.js"></script>
+    <script src="sub_tools/data/erp_data.js"></script>
     <script>
         const data = window.indexEvaData.data.items;
         const meta = window.reportMeta || {};
@@ -761,6 +762,15 @@
                     valType: 'val' });
             }
 
+            // ERP股权风险溢价
+            if (window.erpData) {
+                rows.push({ 名称: window.erpData['名称'], 编码: window.erpData['编码'],
+                    目标值: window.erpData['目标值'], 当前值: window.erpData['当前值'],
+                    比例: window.erpData['比例'], 备注: window.erpData['备注']||'-',
+                    分组: window.erpData['分组'], 更新时间: window.erpData['更新时间'],
+                    valType: 'val' });
+            }
+
             return rows;
         }
 
@@ -820,6 +830,9 @@
             let shillerStr = window.shillerData && window.shillerData['当前值'] !== undefined ? formatVal(window.shillerData['当前值']) : '-';
             let vsStr = `${vixStr} & ${shillerStr}`;
 
+            // 4. ERP股权风险溢价
+            let erpStr = window.erpData && window.erpData['当前值'] !== undefined ? window.erpData['当前值'].toFixed(2) + '%' : '-';
+
             document.getElementById('summaryBar').innerHTML = `
                 <div class="stat">
                     <div class="label" style="font-weight:600; color:#1e3a5f; margin-bottom:8px; font-size:14px;">破净股</div>
@@ -835,6 +848,11 @@
                     <div class="label" style="font-weight:600; color:#1e3a5f; margin-bottom:8px; font-size:14px;">VIX & Shiller PE</div>
                     <div class="num" style="font-size:24px;">${vsStr}</div>
                     <div class="label" style="font-size:12px; margin-top:8px;">(目标是满足30恐慌和20PE)</div>
+                </div>
+                <div class="stat">
+                    <div class="label" style="font-weight:600; color:#1e3a5f; margin-bottom:8px; font-size:14px;">股权风险溢价</div>
+                    <div class="num">${erpStr}</div>
+                    <div class="label" style="font-size:12px; margin-top:8px;">(目标6%为极度低估)</div>
                 </div>
             `;
         }
