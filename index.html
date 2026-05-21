@@ -830,8 +830,8 @@
             let shillerStr = window.shillerData && window.shillerData['当前值'] !== undefined ? formatVal(window.shillerData['当前值']) : '-';
             let vsStr = `${vixStr} & ${shillerStr}`;
 
-            // 4. ERP股权风险溢价
-            let erpStr = window.erpData && window.erpData['当前值'] !== undefined ? window.erpData['当前值'].toFixed(2) + '%' : '-';
+            // 4. ERP股权风险溢价（实际值在目标值字段，同破净股占比逻辑）
+            let erpStr = window.erpData && window.erpData['目标值'] !== undefined ? window.erpData['目标值'].toFixed(2) + '%' : '-';
 
             document.getElementById('summaryBar').innerHTML = `
                 <div class="stat">
