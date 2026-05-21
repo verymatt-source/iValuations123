@@ -7351,8 +7351,8 @@ window.historySnapshot = [
   },
   {
     "snapshot_date": "2026-05-21",
-    "snapshot_time": "22:06",
-    "timestamp": 1779372373,
+    "snapshot_time": "22:12",
+    "timestamp": 1779372731,
     "key_markets": [
       {
         "id": 508722,
@@ -7376,9 +7376,9 @@ window.historySnapshot = [
         "peg": 1.551,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.7088,
         "pe_over_history": 0.2616,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7403,9 +7403,9 @@ window.historySnapshot = [
         "peg": 1.6764,
         "pb_flag": false,
         "source": "5",
+        "date": "05-20",
         "pb_over_history": 0.21,
         "pe_over_history": 0.2076,
-        "date": "05-20",
         "star": 2
       },
       {
@@ -7430,9 +7430,9 @@ window.historySnapshot = [
         "peg": 0.9661,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.5592,
         "pe_over_history": 0.1156,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7457,9 +7457,9 @@ window.historySnapshot = [
         "peg": 0.7792,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.1952,
         "pe_over_history": 0.1416,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7484,9 +7484,9 @@ window.historySnapshot = [
         "peg": 0.6971,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.2876,
         "pe_over_history": 0.4204,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7511,9 +7511,9 @@ window.historySnapshot = [
         "peg": 0.8724,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.0582,
         "pe_over_history": 0.0582,
-        "date": "05-21",
         "star": 2
       }
     ],
@@ -7521,10 +7521,11 @@ window.historySnapshot = [
       "破净股占比": {
         "名称": "破净股占比",
         "编码": "PJGZB",
-        "目标值": 0.06359847798514223,
-        "当前值": 0.1,
-        "比例": 0.5723646723646726,
-        "备注": "目标值即实际值",
+        "目标值": 0.1,
+        "当前值": 0.06359847798514223,
+        "比例": -0.36401522014857773,
+        "方向": "low",
+        "备注": "",
         "分组": "核心指标",
         "更新时间": "2026-05-21",
         "_extra": {
@@ -7546,11 +7547,11 @@ window.historySnapshot = [
         "名称": "美元兑人民币",
         "编码": "USDCNY",
         "目标值": 6.8,
-        "当前值": 6.803,
-        "比例": 0.000441176470588252,
+        "当前值": 6.8023,
+        "比例": 0.00033823529411764245,
         "备注": "",
         "分组": "全球",
-        "更新时间": "2026-05-21 22:05:07"
+        "更新时间": "2026-05-21 22:11:33"
       },
       "Shiller PE": {
         "名称": "Shiller PE",
@@ -7571,7 +7572,7 @@ window.historySnapshot = [
         "方向": "low",
         "备注": "",
         "分组": "全球",
-        "更新时间": "2026-05-21 22:06"
+        "更新时间": "2026-05-21 22:12"
       },
       "中证煤炭PB": {
         "名称": "中证煤炭PB",
