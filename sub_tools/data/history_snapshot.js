@@ -7598,8 +7598,8 @@ window.historySnapshot = [
   },
   {
     "snapshot_date": "2026-05-22",
-    "snapshot_time": "09:40",
-    "timestamp": 1779414022,
+    "snapshot_time": "11:50",
+    "timestamp": 1779421836,
     "key_markets": [
       {
         "id": 508722,
