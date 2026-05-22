@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>指标说明 - 投资工具箱</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #eef2f7;
+            color: #2c3e50;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 32px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .page-header { margin-bottom: 28px; }
+        .page-title { font-size: 26px; font-weight: 600; color: #1a252f; }
+        .page-subtitle { font-size: 14px; color: #7f8c8d; margin-top: 4px; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; color: #2c5282; text-decoration: none;
+            font-weight: 500; margin-top: 10px;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* ========== 指标卡片 ========== */
+        .indicator-card {
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .indicator-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            background: #2c5282;
+            color: #fff;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .indicator-header:hover { background: #1e3a5f; }
+        .indicator-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .indicator-title .icon { font-size: 20px; }
+        .indicator-title .text { font-size: 16px; font-weight: 600; }
+        .indicator-title .tag {
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+        .indicator-toggle {
+            font-size: 12px;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .indicator-toggle .arrow {
+            display: inline-block;
+            transition: transform 0.25s ease;
+            font-size: 11px;
+        }
+        .indicator-toggle.open .arrow { transform: rotate(90deg); }
+
+        .indicator-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .indicator-body.open { max-height: 2000px; }
+
+        .indicator-content {
+            padding: 24px;
+        }
+
+        /* ========== 内容排版 ========== */
+        .section-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c5282;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .section-label:not(:first-child) { margin-top: 24px; }
+
+        .formula-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #2c5282;
+            border-radius: 6px;
+            padding: 14px 18px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 14px;
+            color: #1e3a5f;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .desc-text {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.8;
+        }
+        .desc-text strong { color: #1e3a5f; }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+        .info-table th, .info-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .info-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #374151;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .info-table td { color: #475569; }
+        .info-table tr:last-child td { border-bottom: none; }
+
+        .warn-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 6px;
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #92400e;
+            line-height: 1.7;
+            margin: 12px 0;
+        }
+        .warn-box strong { color: #78350f; }
+
+        .tip-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #3b82f6;
+            border-radius: 6px;
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #1e40af;
+            line-height: 1.7;
+            margin: 12px 0;
+        }
+
+        .ref-text {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.7;
+        }
+        .ref-text strong { color: #64748b; }
+
+        /* ========== 导航锚点 ========== */
+        .nav-bar {
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 16px 24px;
+        }
+        .nav-bar .nav-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .nav-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #2c5282;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .nav-links a:hover { background: #e2e8f0; }
+        .nav-links a .nav-icon { font-size: 14px; }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #95a5a6;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            body { padding: 16px; }
+            .indicator-content { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">指标说明</h1>
+            <p class="page-subtitle">概念 · 计算方法 · 局限性 · 使用建议</p>
+            <a class="back-link" href="index.html">← 返回估值主页</a>
+        </div>
+
+        <!-- ========== 快速导航 ========== -->
+        <div class="nav-bar">
+            <div class="nav-title">快速导航</div>
+            <div class="nav-links" id="navLinks">
+                <!-- JS 动态生成 -->
+            </div>
+        </div>
+
+        <!-- ========== ERP 股权风险溢价 ========== -->
+        <div class="indicator-card" id="erp">
+            <div class="indicator-header" onclick="toggleCard('erp')">
+                <div class="indicator-title">
+                    <span class="icon">📊</span>
+                    <span class="text">股权风险溢价（ERP）</span>
+                    <span class="tag">A股</span>
+                </div>
+                <div class="indicator-toggle" id="erp-toggle">
+                    <span>展开</span>
+                    <span class="arrow">▸</span>
+                </div>
+            </div>
+            <div class="indicator-body" id="erp-body">
+                <div class="indicator-content">
+
+                    <div class="section-label">概念</div>
+                    <div class="desc-text">
+                        股权风险溢价（Equity Risk Premium, ERP）衡量的是<strong>股票收益率超出无风险收益率的部分</strong>，
+                        即投资者因承担股票的额外风险而要求的补偿。ERP越高，说明股票相对债券越有吸引力。
+                    </div>
+
+                    <div class="section-label">计算公式</div>
+                    <div class="formula-box">ERP = 1 / 沪深300 PE − 10年期国债收益率</div>
+                    <div class="desc-text">
+                        其中：<strong>1/PE</strong>即盈利收益率（Earnings Yield），代表持有指数的隐含回报率；
+                        <strong>10年期国债收益率</strong>代表无风险利率。
+                    </div>
+
+                    <div class="section-label">阈值含义</div>
+                    <table class="info-table">
+                        <thead>
+                            <tr><th>ERP 区间</th><th>信号</th><th>含义</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>> 6%</td><td style="color:#059669;font-weight:600">极度低估</td><td>股票极其便宜，历史大底区域</td></tr>
+                            <tr><td>4% ~ 6%</td><td style="color:#d97706;font-weight:600">合理偏低</td><td>股票有一定配置价值</td></tr>
+                            <tr><td>2% ~ 4%</td><td style="color:#d97706;font-weight:600">中性偏贵</td><td>风险补偿不足，需谨慎</td></tr>
+                            <tr><td>< 2%</td><td style="color:#dc2626;font-weight:600">极度高估</td><td>股票风险极大，债券更优</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-label">数据来源</div>
+                    <table class="info-table">
+                        <thead>
+                            <tr><th>字段</th><th>来源</th><th>说明</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>沪深300 PE</td><td>蛋卷基金 API</td><td>实时市盈率，滚动PE</td></tr>
+                            <tr><td>10年期国债收益率</td><td>akshare bond_china_yield()</td><td>中债国债收益率曲线"10年"列</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-label">局限性</div>
+                    <div class="warn-box">
+                        <strong>⚠️ 低利率环境下的失真风险</strong><br>
+                        当10年期国债收益率处于极端低位时（当前约1.65%），ERP会被动抬高，产生"股市极度便宜"的幻觉。
+                        此时的ERP高并非因为PE真的低，而是分母（无风险利率）被政策压低所致。
+                        <br><br>
+                        <strong>核心问题：货币幻觉（Money Illusion）</strong><br>
+                        低利率通常伴随低通胀，企业名义盈利增长也低。用名义股票收益率和名义债券收益率直接比较，
+                        混淆了实际与名义收益，会系统性高估股票吸引力。（Asness, 2003）
+                        <br><br>
+                        <strong>日本前车之鉴：</strong>1995–2012年，日本国债接近0利率，ERP长期为正，
+                        但日经225从40000点跌至8000点，跌幅80%。
+                    </div>
+
+                    <div class="section-label">调整后 ERP（去除利率扭曲）</div>
+                    <div class="formula-box">调整后ERP = 1 / 沪深300 PE − 10年期国债近10年历史均值</div>
+                    <div class="desc-text">
+                        当前国债收益率处于极端低位（政策驱动），导致ERP虚高。为消除这一扭曲，
+                        将分母替换为<strong>10年期国债近10年（2016-2025）年度均值2.9%</strong>，
+                        得到去利率扭曲后的估值信号。
+                    </div>
+                    <table class="info-table">
+                        <thead>
+                            <tr><th>对比</th><th>公式</th><th>当前值</th><th>含义</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ERP（当前）</td>
+                                <td>1/PE − 当前国债收益率</td>
+                                <td style="font-weight:600">5.20%</td>
+                                <td>实时股债性价比，受利率极端位影响偏乐观</td>
+                            </tr>
+                            <tr>
+                                <td>ERP（调整）</td>
+                                <td>1/PE − 国债历史均值2.9%</td>
+                                <td style="font-weight:600;color:#d97706">4.05%</td>
+                                <td>去利率扭曲后的真实估值信号，更接近"合理偏低"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box">
+                        <strong>国债均值说明：</strong>2.9%基于中债国债收益率曲线2016-2025年度均值，
+                        数据来源为中国债券信息网（chinabond.com.cn）和akshare交叉验证。
+                        该值为硬编码常量，每年初手动更新一次（akshare接口无法获取5年以上历史数据）。
+                    </div>
+
+                    <div class="section-label">使用建议</div>
+                    <div class="tip-box">
+                        ✅ ERP适合判断股债相对吸引力（配置方向），不适合精确择时<br>
+                        ✅ 当10年期国债 < 2% 时，需结合PE/PB百分位综合判断<br>
+                        ✅ ERP与PE百分位信号一致时置信度高；矛盾时降低仓位、等待收敛<br>
+                        ✅ 调整后ERP（备注中显示）更可靠，去除了利率扭曲的影响<br>
+                        ❌ 不要因ERP接近6%就认为"股市见底"<br>
+                        ❌ 不要在低利率环境下单独依赖当前ERP做决策
+                    </div>
+
+                    <div class="section-label">学术参考</div>
+                    <div class="ref-text">
+                        <strong>Asness, C.</strong> (2003). "Fighting the Fed Model." <em>Journal of Portfolio Management</em>. — 论证Fed Model/ERP存在货币幻觉错误<br>
+                        <strong>Campbell, J. & Shiller, R.</strong> (2001). — 证明Shiller PE对长期回报的预测能力优于ERP<br>
+                        <strong>Damodaran, A.</strong> (NYU Stern). "Equity Risk Premiums: Determinants, Estimation and Implications." — 提出Normalized ERP（用正常化利率替代极端利率），即本站"调整后ERP"的理论依据<br>
+                        <strong>BIS Working Papers.</strong> — 多次引用日本案例，说明低利率下ERP择时有效性大幅下降
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 破净股占比 ========== -->
+        <div class="indicator-card" id="pjgzb">
+            <div class="indicator-header" onclick="toggleCard('pjgzb')">
+                <div class="indicator-title">
+                    <span class="icon">📉</span>
+                    <span class="text">破净股占比</span>
+                    <span class="tag">核心指标</span>
+                </div>
+                <div class="indicator-toggle" id="pjgzb-toggle">
+                    <span>展开</span>
+                    <span class="arrow">▸</span>
+                </div>
+            </div>
+            <div class="indicator-body" id="pjgzb-body">
+                <div class="indicator-content">
+
+                    <div class="section-label">概念</div>
+                    <div class="desc-text">
+                        破净股占比是指<strong>市净率（PB）≤ 1的股票数量占全市场股票总数的比例</strong>。
+                        当大量股票跌破净资产时，通常意味着市场处于极度恐慌状态，是重要的底部信号。
+                    </div>
+
+                    <div class="section-label">计算公式</div>
+                    <div class="formula-box">破净股占比 = 破净股数量（0 ≤ PB ≤ 1）/ 全市场股票总数 × 100%</div>
+
+                    <div class="section-label">数据来源</div>
+                    <div class="desc-text">
+                        东方财富 RPT_VALUEANALYSIS_DET 接口，获取全A股 PB 数据后本地计算。
+                    </div>
+
+                    <div class="section-label">局限性</div>
+                    <div class="warn-box">
+                        <strong>⚠️ 以下情况可能导致信号偏差：</strong><br>
+                        • 注册制扩容后，壳价值下降，部分股票长期破净属于正常现象<br>
+                        • 银行、地产等重资产行业天然PB偏低，结构性影响占比<br>
+                        • 破净股占比是同步指标而非领先指标，见底时占比最高，但无法预测何时反转
+                    </div>
+
+                    <div class="section-label">使用建议</div>
+                    <div class="tip-box">
+                        ✅ 破净股占比 > 10% 时市场处于恐慌区域，值得关注<br>
+                        ✅ 结合历史分位使用：当前占比相对过去5年的位置更有参考价值<br>
+                        ✅ 与VIX、ERP等情绪指标交叉验证<br>
+                        ❌ 不建议单独作为买入信号，需等待右侧确认
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== VIX 恐慌指数 ========== -->
+        <div class="indicator-card" id="vix">
+            <div class="indicator-header" onclick="toggleCard('vix')">
+                <div class="indicator-title">
+                    <span class="icon">⚡</span>
+                    <span class="text">VIX 恐慌指数</span>
+                    <span class="tag">全球</span>
+                </div>
+                <div class="indicator-toggle" id="vix-toggle">
+                    <span>展开</span>
+                    <span class="arrow">▸</span>
+                </div>
+            </div>
+            <div class="indicator-body" id="vix-body">
+                <div class="indicator-content">
+
+                    <div class="section-label">概念</div>
+                    <div class="desc-text">
+                        VIX（Volatility Index）是由芝加哥期权交易所（CBOE）编制的<strong>隐含波动率指数</strong>，
+                        反映市场对未来30天标普500波动率的预期。VIX越高，市场恐慌情绪越强。
+                    </div>
+
+                    <div class="section-label">阈值含义</div>
+                    <table class="info-table">
+                        <thead>
+                            <tr><th>VIX 区间</th><th>信号</th><th>含义</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>< 15</td><td style="color:#dc2626;font-weight:600">市场过热</td><td>波动率极低，投资者过度乐观</td></tr>
+                            <tr><td>15 ~ 20</td><td style="color:#d97706;font-weight:600">正常</td><td>市场情绪平稳</td></tr>
+                            <tr><td>20 ~ 30</td><td style="color:#d97706;font-weight:600">恐慌升温</td><td>不确定性上升，需关注风险</td></tr>
+                            <tr><td>> 30</td><td style="color:#059669;font-weight:600">极度恐慌</td><td>市场恐慌，往往对应底部区域</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-label">数据来源</div>
+                    <div class="desc-text">
+                        CBOE 官网（https://www.cboe.com/tradable_products/vix/），
+                        从页面 Next.js SSR 渲染的 JS 数据中提取最新 VIX 值。
+                    </div>
+
+                    <div class="section-label">局限性</div>
+                    <div class="warn-box">
+                        <strong>⚠️ 注意：</strong><br>
+                        • VIX 是美股波动率指标，对A股只有间接参考意义<br>
+                        • VIX 是短期情绪指标，高VIX不意味着立即见底（可能持续高位数周）<br>
+                        • VIX 低也不等于股市要跌，长期低VIX可能只是平静期
+                    </div>
+
+                    <div class="section-label">使用建议</div>
+                    <div class="tip-box">
+                        ✅ VIX > 30 时全球风险偏好极低，是逆向布局的参考时机<br>
+                        ✅ 与Shiller PE结合：VIX高 + Shiller PE低 = 最佳买入窗口<br>
+                        ❌ VIX对A股的预测力有限，需结合A股自身指标
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== Shiller PE ========== -->
+        <div class="indicator-card" id="shiller">
+            <div class="indicator-header" onclick="toggleCard('shiller')">
+                <div class="indicator-title">
+                    <span class="icon">🔬</span>
+                    <span class="text">Shiller PE（周期调整市盈率）</span>
+                    <span class="tag">全球</span>
+                </div>
+                <div class="indicator-toggle" id="shiller-toggle">
+                    <span>展开</span>
+                    <span class="arrow">▸</span>
+                </div>
+            </div>
+            <div class="indicator-body" id="shiller-body">
+                <div class="indicator-content">
+
+                    <div class="section-label">概念</div>
+                    <div class="desc-text">
+                        Shiller PE（也称CAPE，Cyclically Adjusted Price-to-Earnings Ratio）由诺贝尔经济学奖得主
+                        <strong>Robert Shiller</strong> 提出，用<strong>过去10年经通胀调整的平均盈利</strong>替代单年盈利来计算PE，
+                        从而平滑经济周期对盈利的扭曲。
+                    </div>
+
+                    <div class="section-label">计算公式</div>
+                    <div class="formula-box">Shiller PE = 标普500当前价格 / 过去10年经CPI调整的平均每股收益</div>
+
+                    <div class="section-label">阈值含义</div>
+                    <table class="info-table">
+                        <thead>
+                            <tr><th>Shiller PE</th><th>信号</th><th>含义</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>< 10</td><td style="color:#059669;font-weight:600">极度低估</td><td>历史罕见底部</td></tr>
+                            <tr><td>10 ~ 20</td><td style="color:#059669;font-weight:600">合理偏低</td><td>长期回报预期较好</td></tr>
+                            <tr><td>20 ~ 30</td><td style="color:#d97706;font-weight:600">中性偏贵</td><td>回报预期一般</td></tr>
+                            <tr><td>> 30</td><td style="color:#dc2626;font-weight:600">极度高估</td><td>未来10年回报大概率低于均值</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-label">数据来源</div>
+                    <div class="desc-text">
+                        multpl.com/shiller-pe，从页面HTML中提取当前Shiller PE数值及时间戳。
+                    </div>
+
+                    <div class="section-label">局限性</div>
+                    <div class="warn-box">
+                        <strong>⚠️ 注意：</strong><br>
+                        • Shiller PE 是标普500的指标，不能直接套用A股<br>
+                        • 10年回看期意味着对盈利变化反应迟缓（优点也是缺点）<br>
+                        • 低利率环境下，"合理"的Shiller PE可能比历史均值更高（但学术共识是偏差有限）<br>
+                        • Shiller PE对短期（1-2年）走势几乎没有预测力，适用于5-10年长周期判断
+                    </div>
+
+                    <div class="section-label">使用建议</div>
+                    <div class="tip-box">
+                        ✅ Shiller PE是美股长期估值最可靠的单一指标（Shiller & Campbell 实证支持）<br>
+                        ✅ 目标值20：低于20时美股长期回报显著高于高于20时<br>
+                        ✅ 与VIX结合使用效果更好<br>
+                        ❌ 不适合短期择时
+                    </div>
+
+                    <div class="section-label">学术参考</div>
+                    <div class="ref-text">
+                        <strong>Shiller, R.</strong> (2000). <em>Irrational Exuberance</em>. — Shiller PE的奠基之作<br>
+                        <strong>Campbell, J. & Shiller, R.</strong> (1998). "Valuation Ratios and the Long-Run Stock Market Outlook."
+                        <em>Journal of Portfolio Management</em>.
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 可转债均价 ========== -->
+        <div class="indicator-card" id="kzzjj">
+            <div class="indicator-header" onclick="toggleCard('kzzjj')">
+                <div class="indicator-title">
+                    <span class="icon">💱</span>
+                    <span class="text">可转债均价</span>
+                    <span class="tag">A股</span>
+                </div>
+                <div class="indicator-toggle" id="kzzjj-toggle">
+                    <span>展开</span>
+                    <span class="arrow">▸</span>
+                </div>
+            </div>
+            <div class="indicator-body" id="kzzjj-body">
+                <div class="indicator-content">
+
+                    <div class="section-label">概念</div>
+                    <div class="desc-text">
+                        可转债均价是全市场<strong>可交易可转债的平均价格</strong>。
+                        可转债兼具债性和股性，其均价反映了市场对转债品种的整体定价水平。
+                        均价越低，说明市场给予转债的估值越便宜，安全边际越高。
+                    </div>
+
+                    <div class="section-label">计算公式</div>
+                    <div class="formula-box">可转债均价 = 所有可交易可转债（volume > 0）的价格之和 / 可交易可转债数量</div>
+
+                    <div class="section-label">数据来源</div>
+                    <div class="desc-text">
+                        新浪财经可转债列表 API。
+                    </div>
+
+                    <div class="section-label">局限性</div>
+                    <div class="warn-box">
+                        <strong>⚠️ 注意：</strong><br>
+                        • 新发转债数量逐年增加，样本结构变化会影响均价可比性<br>
+                        • 部分转债因信用风险低价交易，拉低均价但不代表投资价值<br>
+                        • 目标值115元是经验值，非严格统计阈值
+                    </div>
+
+                    <div class="section-label">使用建议</div>
+                    <div class="tip-box">
+                        ✅ 均价 < 115 元时，转债整体具备较好的债底保护<br>
+                        ✅ 适合作为转债组合的仓位参考：均价越低，仓位可越重<br>
+                        ❌ 不适合作为股票市场的择时信号
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 美元兑人民币 ========== -->
+        <div class="indicator-card" id="usdcny">
+            <div class="indicator-header" onclick="toggleCard('usdcny')">
+                <div class="indicator-title">
+                    <span class="icon">🌐</span>
+                    <span class="text">美元兑人民币（USDCNY）</span>
+                    <span class="tag">全球</span>
+                </div>
+                <div class="indicator-toggle" id="usdcny-toggle">
+                    <span>展开</span>
+                    <span class="arrow">▸</span>
+                </div>
+            </div>
+            <div class="indicator-body" id="usdcny-body">
+                <div class="indicator-content">
+
+                    <div class="section-label">概念</div>
+                    <div class="desc-text">
+                        USDCNY汇率反映<strong>1美元可兑换的人民币数量</strong>。数值越高，人民币越贬值；
+                        数值越低，人民币越升值。该指标对跨境资金流动、外资配置A股意愿有直接影响。
+                    </div>
+
+                    <div class="section-label">数据来源</div>
+                    <div class="desc-text">
+                        新浪财经外汇 API（https://hq.sinajs.cn/list=fx_susdcny）。
+                    </div>
+
+                    <div class="section-label">局限性</div>
+                    <div class="warn-box">
+                        <strong>⚠️ 注意：</strong><br>
+                        • 目标值6.80是经验参考值，非精确阈值<br>
+                        • 汇率受央行中间价管理影响，非完全市场定价<br>
+                        • 短期波动剧烈，日频数据噪音较大
+                    </div>
+
+                    <div class="section-label">使用建议</div>
+                    <div class="tip-box">
+                        ✅ USDCNY > 7.2 时，人民币贬值压力较大，需关注外资流出风险<br>
+                        ✅ 汇率与A股有一定负相关：人民币升值往往伴随A股走强<br>
+                        ❌ 不建议基于汇率做短期交易
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 星级评分体系 ========== -->
+        <div class="indicator-card" id="star">
+            <div class="indicator-header" onclick="toggleCard('star')">
+                <div class="indicator-title">
+                    <span class="icon">⭐</span>
+                    <span class="text">星级评分体系</span>
+                    <span class="tag">本站</span>
+                </div>
+                <div class="indicator-toggle" id="star-toggle">
+                    <span>展开</span>
+                    <span class="arrow">▸</span>
+                </div>
+            </div>
+            <div class="indicator-body" id="star-body">
+                <div class="indicator-content">
+
+                    <div class="section-label">概念</div>
+                    <div class="desc-text">
+                        星级评分是本站基于<strong>PE/PB历史百分位 + ROE + 股息率</strong>综合计算的估值评分，
+                        用于快速识别低估/高估的指数。1星最差，5星最好。
+                    </div>
+
+                    <div class="section-label">评分规则</div>
+                    <table class="info-table">
+                        <thead>
+                            <tr><th style="width:70px">星级</th><th>判定条件</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span style="color:#f59e0b">★★★★★</span></td>
+                                <td>低估 + PE百分位 ≤ 10% + PB百分位 ≤ 10% +（ROE ≥ 20% <strong>或</strong> 股息率 ≤ 1.5%）</td>
+                            </tr>
+                            <tr>
+                                <td><span style="color:#f59e0b">★★★★</span></td>
+                                <td>低估，但不满足五星的全部条件</td>
+                            </tr>
+                            <tr>
+                                <td><span style="color:#94a3b8">★★★</span></td>
+                                <td>正常估值（PE/PB百分位在 30%~70% 区间）</td>
+                            </tr>
+                            <tr>
+                                <td><span style="color:#94a3b8">★★</span></td>
+                                <td>高估（PE/PB百分位 ≥ 70%）</td>
+                            </tr>
+                            <tr>
+                                <td><span style="color:#cbd5e1">★</span></td>
+                                <td>PE = 0 或 PB = 0（数据缺失或异常）</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-label">数据来源</div>
+                    <div class="desc-text">
+                        蛋卷基金 API，低估/正常/高估由蛋卷根据历史百分位判定。
+                        百分位基准为该指数历史 PE/PB 数据的百分位排名。
+                    </div>
+
+                    <div class="section-label">局限性</div>
+                    <div class="warn-box">
+                        <strong>⚠️ 注意：</strong><br>
+                        • 百分位基于历史数据，"历史区间"的选择影响结果（指数历史短则百分位不可靠）<br>
+                        • 不同行业PE中枢差异大（如科技PE天然高于银行），跨行业比较需谨慎<br>
+                        • 五星条件中"股息率 ≤ 1.5%"的逻辑：低股息率意味着企业将利润用于再投资而非分红，
+                          这在成长型指数中更常见；但部分高股息蓝筹（如银行）因此无法获得五星<br>
+                        • 星级是静态快照，不反映趋势（连续3个月三星可能正在向四星演进）
+                    </div>
+
+                    <div class="section-label">使用建议</div>
+                    <div class="tip-box">
+                        ✅ 五星指数可作为定投候选清单，但需结合行业基本面判断<br>
+                        ✅ 星级变化趋势比单次快照更有价值：观察星级从3→4→5的演进<br>
+                        ✅ 同一指数历史百分位纵向比较比跨指数横向比较更有意义<br>
+                        ❌ 不建议仅凭五星就重仓单一指数
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            投资有风险，入市需谨慎 | 所有指标均为静态估算，无法消除未来风险
+        </div>
+    </div>
+
+    <script>
+        // ── 指标导航数据 ──
+        const indicators = [
+            { id: 'erp',     icon: '📊', label: 'ERP' },
+            { id: 'pjgzb',   icon: '📉', label: '破净股占比' },
+            { id: 'vix',     icon: '⚡', label: 'VIX' },
+            { id: 'shiller', icon: '🔬', label: 'Shiller PE' },
+            { id: 'kzzjj',   icon: '💱', label: '可转债均价' },
+            { id: 'usdcny',  icon: '🌐', label: 'USDCNY' },
+            { id: 'star',    icon: '⭐', label: '星级评分' },
+        ];
+
+        // 生成导航链接
+        const navLinks = document.getElementById('navLinks');
+        indicators.forEach(ind => {
+            const a = document.createElement('a');
+            a.href = '#' + ind.id;
+            a.innerHTML = '<span class="nav-icon">' + ind.icon + '</span>' + ind.label;
+            navLinks.appendChild(a);
+        });
+
+        // ── 展开/折叠 ──
+        function toggleCard(id) {
+            const body = document.getElementById(id + '-body');
+            const toggle = document.getElementById(id + '-toggle');
+            const isOpen = body.classList.contains('open');
+            if (isOpen) {
+                body.classList.remove('open');
+                toggle.classList.remove('open');
+                toggle.querySelector('span:first-child').textContent = '展开';
+            } else {
+                body.classList.add('open');
+                toggle.classList.add('open');
+                toggle.querySelector('span:first-child').textContent = '收起';
+            }
+        }
+
+        // ── URL hash 自动展开对应指标 ──
+        function checkHash() {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const body = document.getElementById(hash + '-body');
+                const toggle = document.getElementById(hash + '-toggle');
+                if (body && !body.classList.contains('open')) {
+                    body.classList.add('open');
+                    toggle.classList.add('open');
+                    toggle.querySelector('span:first-child').textContent = '收起';
+                    // 滚动到该指标
+                    setTimeout(() => {
+                        document.getElementById(hash).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                }
+            }
+        }
+        window.addEventListener('hashchange', checkHash);
+        window.addEventListener('load', checkHash);
+    </script>
+</body>
+</html>
