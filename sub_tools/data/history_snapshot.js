@@ -7598,8 +7598,8 @@ window.historySnapshot = [
   },
   {
     "snapshot_date": "2026-05-22",
-    "snapshot_time": "11:56",
-    "timestamp": 1779422187,
+    "snapshot_time": "21:19",
+    "timestamp": 1779455990,
     "key_markets": [
       {
         "id": 508722,
@@ -7623,9 +7623,9 @@ window.historySnapshot = [
         "peg": 1.551,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.7088,
         "pe_over_history": 0.2616,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7650,9 +7650,9 @@ window.historySnapshot = [
         "peg": 1.658,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.2372,
         "pe_over_history": 0.2296,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7677,9 +7677,9 @@ window.historySnapshot = [
         "peg": 0.9664,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.5592,
         "pe_over_history": 0.1156,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7704,9 +7704,9 @@ window.historySnapshot = [
         "peg": 0.7791,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.1952,
         "pe_over_history": 0.1416,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7731,9 +7731,9 @@ window.historySnapshot = [
         "peg": 0.6971,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.2876,
         "pe_over_history": 0.4204,
-        "date": "05-21",
         "star": 2
       },
       {
@@ -7758,9 +7758,9 @@ window.historySnapshot = [
         "peg": 0.8728,
         "pb_flag": false,
         "source": "5",
+        "date": "05-21",
         "pb_over_history": 0.0582,
         "pe_over_history": 0.0582,
-        "date": "05-21",
         "star": 2
       }
     ],
@@ -7794,11 +7794,11 @@ window.historySnapshot = [
         "名称": "美元兑人民币",
         "编码": "USDCNY",
         "目标值": 6.8,
-        "当前值": 6.7977,
-        "比例": -0.00033823529411764245,
+        "当前值": 6.7987,
+        "比例": -0.00019117647058818158,
         "备注": "",
         "分组": "全球",
-        "更新时间": "2026-05-22 11:49:47"
+        "更新时间": "2026-05-22 11:56:04"
       },
       "Shiller PE": {
         "名称": "Shiller PE",
@@ -7819,7 +7819,7 @@ window.historySnapshot = [
         "方向": "low",
         "备注": "",
         "分组": "全球",
-        "更新时间": "2026-05-22 11:50"
+        "更新时间": "2026-05-22 11:56"
       },
       "中证煤炭PB": {
         "名称": "中证煤炭PB",
