@@ -497,7 +497,7 @@
         const data = window.indexEvaData.data.items;
         const meta = window.reportMeta || {};
         let sortField = 'name', sortOrder = 'asc';
-        let monitorSortField = '名称', monitorSortOrder = 'asc';
+        let monitorSortField = '比例', monitorSortOrder = 'asc';
         let marketSortField = 'name', marketSortOrder = 'asc';
         
         // 显示时间和数据更新时间
@@ -787,9 +787,16 @@
         function renderMonitor() {
             const rows = getMonitorRows();
 
-            // 排序
+            // 排序：比例字段按显示值排序（方向=low的指标取反）
             rows.sort((a,b) => {
                 let va = a[monitorSortField], vb = b[monitorSortField];
+
+                // 按显示值排序：方向=low的指标，排序时取反使-0.42变成0.42（原本比例存的是负数，显示时取反成正数）
+                if (monitorSortField === '比例') {
+                    if (a['方向'] === 'low') va = -va;
+                    if (b['方向'] === 'low') vb = -vb;
+                }
+
                 if (typeof va === 'string') return monitorSortOrder==='asc' ? va.localeCompare(vb) : vb.localeCompare(va);
                 return monitorSortOrder==='asc' ? (va||0)-(vb||0) : (vb||0)-(va||0);
             });
