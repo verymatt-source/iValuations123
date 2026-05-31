@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>买入过检清单</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #eef2f7;
+            color: #2c3e50;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 32px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* ========== 页面头部 ========== */
+        .page-header { margin-bottom: 28px; }
+        .page-title { font-size: 26px; font-weight: 600; color: #1a252f; }
+        .page-subtitle { font-size: 14px; color: #7f8c8d; margin-top: 4px; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 13px; color: #2c5282; text-decoration: none; font-weight: 500;
+            margin-top: 8px;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* ========== 测试模式提示 ========== */
+        .test-banner {
+            display: none;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #92400e;
+            font-weight: 500;
+        }
+
+        /* ========== 功能区域通用样式（复用 index.html） ========== */
+        .module {
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .module-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 24px;
+            background: #2c5282; color: #fff;
+        }
+        .module-title {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .module-title .icon { font-size: 20px; }
+        .module-title .text { font-size: 16px; font-weight: 600; }
+        .module-title .tag {
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 10px; border-radius: 12px;
+        }
+        .module-info { font-size: 13px; opacity: 0.85; }
+        .module-body { padding: 24px; }
+        .module-footer {
+            padding: 14px 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            font-size: 13px; color: #94a3b8;
+        }
+
+        /* ========== 检查项行 ========== */
+        .check-row {
+            display: flex; align-items: flex-start; gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .check-row:last-child { border-bottom: none; }
+        .check-num {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; flex-shrink: 0;
+            background: #f1f5f9; color: #64748b;
+        }
+        .check-num.pass { background: #d1fae5; color: #059669; }
+        .check-num.fail { background: #fee2e2; color: #dc2626; }
+        .check-num.warn { background: #fef3c7; color: #d97706; }
+        .check-content { flex: 1; }
+        .check-label { font-weight: 600; color: #1e3a5f; font-size: 15px; margin-bottom: 4px; }
+        .check-type {
+            display: inline-block; font-size: 11px; padding: 2px 8px;
+            border-radius: 4px; margin-left: 8px; font-weight: 500;
+        }
+        .type-master { background: #dbeafe; color: #1d4ed8; }
+        .type-target { background: #ede9fe; color: #7c3aed; }
+        .type-quality { background: #fef3c7; color: #92400e; }
+        .type-position { background: #d1fae5; color: #065f46; }
+        .check-desc { font-size: 13px; color: #64748b; margin-bottom: 10px; }
+        .check-result {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 14px; font-weight: 600; padding: 4px 12px;
+            border-radius: 6px;
+        }
+        .result-pass { background: #d1fae5; color: #059669; }
+        .result-fail { background: #fee2e2; color: #dc2626; }
+        .result-warn { background: #fef3c7; color: #d97706; }
+        .result-wait { background: #f1f5f9; color: #94a3b8; }
+
+        /* ========== 数据展示 ========== */
+        .data-display {
+            display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px;
+        }
+        .data-item {
+            background: #f8fafc; border-radius: 8px; padding: 10px 16px;
+            min-width: 140px;
+        }
+        .data-item .label { font-size: 12px; color: #94a3b8; }
+        .data-item .value { font-size: 18px; font-weight: 700; color: #1e3a5f; }
+        .data-item .value.green { color: #059669; }
+        .data-item .value.red { color: #dc2626; }
+        .data-item .value.yellow { color: #d97706; }
+
+        /* ========== 表单 ========== */
+        .form-row {
+            display: flex; gap: 12px; align-items: center;
+            margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .form-row label {
+            font-size: 13px; color: #64748b; font-weight: 500;
+            min-width: 80px; flex-shrink: 0;
+        }
+        .form-row input, .form-row select {
+            padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 6px;
+            font-size: 14px; background: #fff; color: #374151;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-row input:focus, .form-row select:focus {
+            outline: none; border-color: #2c5282;
+            box-shadow: 0 0 0 2px rgba(44,82,130,0.15);
+        }
+        .form-row input:disabled, .form-row select:disabled {
+            background: #f1f5f9; color: #94a3b8; cursor: not-allowed;
+        }
+        .form-row input.missing {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 2px rgba(220,38,38,0.15);
+        }
+        .form-row .unit { font-size: 13px; color: #94a3b8; }
+        .form-row .hint {
+            font-size: 12px; color: #94a3b8; font-style: italic;
+        }
+        .form-row .computed {
+            font-size: 18px; font-weight: 700; color: #1e3a5f; padding: 8px 14px;
+            background: #f8fafc; border-radius: 6px; min-width: 100px; text-align: center;
+        }
+
+        /* ========== 估值模式切换 ========== */
+        .mode-switch {
+            display: flex; gap: 0; margin-bottom: 12px;
+            border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden;
+            width: fit-content;
+        }
+        .mode-btn {
+            padding: 8px 18px; font-size: 13px; font-weight: 500;
+            border: none; cursor: pointer; background: #fff; color: #64748b;
+            transition: all 0.2s;
+        }
+        .mode-btn.active { background: #2c5282; color: #fff; }
+        .mode-btn:hover:not(.active) { background: #f1f5f9; }
+
+        /* ========== 提交按钮 ========== */
+        .submit-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 32px; border: none; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .submit-btn.enabled { background: #2c5282; color: #fff; }
+        .submit-btn.enabled:hover { background: #1e3a5f; }
+        .submit-btn.disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+
+        /* ========== 锁定遮罩 ========== */
+        .locked-overlay {
+            position: relative;
+        }
+        .locked-overlay::after {
+            content: '主开关未通过，暂不可建仓';
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(241,245,249,0.85);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: #94a3b8; font-weight: 500;
+            border-radius: 10px; z-index: 10;
+        }
+        .locked-overlay.unlocked::after { display: none; }
+
+        /* ========== 历史记录表格 ========== */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            padding: 13px 16px; text-align: left; font-size: 12px; font-weight: 600;
+            color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;
+            background: #f8fafc; border-bottom: 1px solid #e2e8f0; white-space: nowrap;
+        }
+        td {
+            padding: 14px 16px; font-size: 14px; color: #374151;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        tr:hover td { background: #f8fafc; }
+        tr:last-child td { border-bottom: none; }
+        .del-btn {
+            padding: 4px 10px; border: 1px solid #fca5a5; border-radius: 4px;
+            background: #fff; color: #dc2626; font-size: 12px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .del-btn:hover { background: #fee2e2; }
+
+        /* ========== 操作按钮 ========== */
+        .action-bar {
+            display: flex; gap: 10px; padding: 14px 24px;
+            background: #f8fafc; border-top: 1px solid #e2e8f0;
+        }
+        .action-btn {
+            padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px;
+            background: #fff; color: #374151; font-size: 13px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { background: #f1f5f9; border-color: #2c5282; color: #2c5282; }
+        .empty-hint { padding: 30px; text-align: center; color: #cbd5e1; font-size: 14px; }
+
+        /* ========== Toast 提示条 ========== */
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 500;
+            z-index: 9999; opacity: 0; transition: opacity 0.3s;
+            pointer-events: none; white-space: nowrap;
+        }
+        .toast.show { opacity: 1; }
+        .toast.clickable { pointer-events: auto; cursor: pointer; text-decoration: underline; }
+        .toast.success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+        .toast.error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .toast.warn { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+
+        /* ========== 备份提醒条 ========== */
+        .backup-reminder {
+            display: none;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #92400e;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .backup-reminder.show { display: flex; }
+        .backup-reminder .reminder-text { flex: 1; font-weight: 500; }
+        .backup-reminder .reminder-btn {
+            padding: 6px 16px; border: none; border-radius: 6px;
+            background: #d97706; color: #fff; font-size: 13px; font-weight: 600;
+            cursor: pointer; white-space: nowrap; transition: background 0.2s;
+        }
+        .backup-reminder .reminder-btn:hover { background: #b45309; }
+        .backup-reminder .reminder-close {
+            padding: 4px 8px; border: none; background: transparent;
+            color: #92400e; font-size: 16px; cursor: pointer; line-height: 1;
+        }
+        .backup-reminder .reminder-close:hover { color: #78350f; }
+
+        /* ========== 内联确认栏 ========== */
+        .confirm-bar {
+            display: none; align-items: center; gap: 12px;
+            padding: 12px 20px; background: #fef3c7; border: 1px solid #fcd34d;
+            border-radius: 8px; margin-bottom: 12px;
+        }
+        .confirm-bar.show { display: flex; }
+        .confirm-bar .msg { flex: 1; font-size: 14px; color: #92400e; font-weight: 500; }
+        .confirm-bar .yes {
+            padding: 6px 16px; border: none; border-radius: 6px;
+            background: #dc2626; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+        .confirm-bar .yes:hover { background: #b91c1c; }
+        .confirm-bar .no {
+            padding: 6px 16px; border: 1px solid #d1d5db; border-radius: 6px;
+            background: #fff; color: #374151; font-size: 13px; cursor: pointer;
+        }
+        .confirm-bar .no:hover { background: #f1f5f9; }
+
+        /* ========== 页脚 ========== */
+        .footer {
+            text-align: center; padding: 24px; color: #95a5a6; font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            body { padding: 16px; }
+            .data-display { flex-direction: column; }
+            .form-row { flex-direction: column; align-items: flex-start; }
+            .form-row input, .form-row select { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Toast 提示条 -->
+        <div class="toast" id="toast"></div>
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <h1 class="page-title">买入过检清单</h1>
+            <p class="page-subtitle">重仓买入前的强制检查 · 防止过早买入</p>
+            <a href="../index.html" class="back-link">← 返回估值报告</a>
+        </div>
+
+        <!-- 测试模式提示 -->
+        <div class="test-banner" id="testBanner">⚠️ 测试模式（模拟数据）</div>
+
+        <!-- 备份提醒条 -->
+        <div class="backup-reminder" id="backupReminder">
+            <span class="reminder-text">⏰ 已超过 7 天未导出备份，建议立即导出以防数据丢失</span>
+            <button class="reminder-btn" onclick="exportJSON()">📥 立即导出</button>
+            <button class="reminder-close" onclick="dismissReminder()" title="关闭提醒">✕</button>
+        </div>
+
+        <!-- ========== 主开关区 ========== -->
+        <div class="module">
+            <div class="module-header">
+                <div class="module-title">
+                    <span class="icon">🔑</span>
+                    <span class="text">主开关</span>
+                    <span class="tag">自动读取</span>
+                </div>
+                <div class="module-info" id="masterSwitchStatus">判定中...</div>
+            </div>
+            <div class="module-body">
+                <!-- ① 宽基双锚 -->
+                <div class="check-row">
+                    <div class="check-num" id="num1">1</div>
+                    <div class="check-content">
+                        <div class="check-label">
+                            宽基双锚
+                            <span class="check-type type-master">主开关</span>
+                        </div>
+                        <div class="check-desc">沪深300 & 中证500，近十年 PE百分位 AND PB百分位 均需 ≤30%</div>
+                        <div class="data-display" id="wideAnchorData">
+                            <div class="data-item">
+                                <div class="label">沪深300 PE百分位</div>
+                                <div class="value" id="hs300Pe">--</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="label">沪深300 PB百分位</div>
+                                <div class="value" id="hs300Pb">--</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="label">中证500 PE百分位</div>
+                                <div class="value" id="zz500Pe">--</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="label">中证500 PB百分位</div>
+                                <div class="value" id="zz500Pb">--</div>
+                            </div>
+                        </div>
+                        <div class="check-result result-wait" id="result1">等待数据</div>
+                    </div>
+                </div>
+
+                <!-- ② 整体破净 -->
+                <div class="check-row">
+                    <div class="check-num" id="num2">2</div>
+                    <div class="check-content">
+                        <div class="check-label">
+                            整体破净
+                            <span class="check-type type-master">主开关</span>
+                        </div>
+                        <div class="check-desc">破净股占比 ≥9%（预估年均约21个交易日达成）</div>
+                        <div class="data-display">
+                            <div class="data-item">
+                                <div class="label">当前破净股占比</div>
+                                <div class="value" id="pjgzbValue">--</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="label">破净股数量 / 总数</div>
+                                <div class="value" id="pjgzbDetail" style="font-size:14px;">--</div>
+                            </div>
+                        </div>
+                        <div class="check-result result-wait" id="result2">等待数据</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 检查项区（主开关通过后解锁） ========== -->
+        <div class="locked-overlay" id="checkArea">
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-title">
+                        <span class="icon">📋</span>
+                        <span class="text">检查项</span>
+                    </div>
+                </div>
+                <div class="module-body">
+                    <!-- ③ 目标估值 -->
+                    <div class="check-row">
+                        <div class="check-num" id="num3">3</div>
+                        <div class="check-content">
+                            <div class="check-label">
+                                目标估值
+                                <span class="check-type type-target">目标</span>
+                            </div>
+                            <div class="check-desc">根据估值模式，满足放行条件</div>
+                            <div class="form-row">
+                                <label>目标</label>
+                                <select id="targetSelect" disabled style="width:220px;" onchange="onTargetChange()">
+                                    <option value="">-- 选择指数 --</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>编码</label>
+                                <span class="computed" id="targetCode" style="font-size:14px;min-width:120px;text-align:left;padding-left:14px;">自动读取</span>
+                            </div>
+                            <div class="form-row">
+                                <label>估值模式</label>
+                                <div class="mode-switch">
+                                    <button class="mode-btn active" id="modePercentile" onclick="switchValMode('percentile')">百分位模式</button>
+                                    <button class="mode-btn" id="modeAbsolute" onclick="switchValMode('absolute')">绝对值模式</button>
+                                </div>
+                            </div>
+                            <!-- 百分位模式 -->
+                            <div id="percentileFields">
+                                <div class="form-row">
+                                    <label>PE百分位</label>
+                                    <span class="computed" id="pePercentileDisplay" style="font-size:14px;min-width:60px;">--</span>
+                                    <span class="unit">%</span>
+                                    <span class="hint">≤30% 放行</span>
+                                </div>
+                                <div class="form-row">
+                                    <label>PB百分位</label>
+                                    <span class="computed" id="pbPercentileDisplay" style="font-size:14px;min-width:60px;">--</span>
+                                    <span class="unit">%</span>
+                                    <span class="hint">≤30% 放行</span>
+                                </div>
+                            </div>
+                            <!-- 绝对值模式 -->
+                            <div id="absoluteFields" style="display:none;">
+                                <div class="form-row">
+                                    <label>PE</label>
+                                    <span class="computed" id="peAbsoluteDisplay" style="font-size:14px;min-width:60px;">--</span>
+                                    <span class="unit">倍</span>
+                                </div>
+                                <div class="form-row">
+                                    <label>PB</label>
+                                    <span class="computed" id="pbAbsoluteDisplay" style="font-size:14px;min-width:60px;">--</span>
+                                    <span class="unit">倍</span>
+                                </div>
+                                <div class="form-row">
+                                    <label>PE阈值</label>
+                                    <input type="number" id="peThreshold" placeholder="留空则不检查" disabled style="width:120px;" oninput="evaluateCheck3()">
+                                    <span class="unit">倍</span>
+                                    <span class="hint">可留空</span>
+                                </div>
+                                <div class="form-row">
+                                    <label>PB阈值</label>
+                                    <input type="number" id="pbThreshold" placeholder="如：1.2" disabled style="width:120px;" oninput="evaluateCheck3()">
+                                    <span class="unit">倍</span>
+                                    <span class="hint">可留空</span>
+                                </div>
+                            </div>
+                            <div class="check-result result-wait" id="result3">等待填写</div>
+                        </div>
+                    </div>
+
+                    <!-- ④ 盈利趋势(E) -->
+                    <div class="check-row">
+                        <div class="check-num" id="num4">4</div>
+                        <div class="check-content">
+                            <div class="check-label">
+                                盈利趋势(E)
+                                <span class="check-type type-quality">质量闸</span>
+                            </div>
+                            <div class="check-desc">近3个单季净利润同比增速 A1→A2→A3，要求 A1≤A2≤A3（跌幅未扩大/增速提升）</div>
+                            <div class="form-row">
+                                <label>A1(前前季)</label>
+                                <input type="number" id="a1" placeholder="如：-8.2" disabled style="width:120px;" oninput="evaluateCheck4()">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="form-row">
+                                <label>A2(前季)</label>
+                                <input type="number" id="a2" placeholder="如：-5.1" disabled style="width:120px;" oninput="evaluateCheck4()">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="form-row">
+                                <label>A3(当季)</label>
+                                <input type="number" id="a3" placeholder="如：2.3" disabled style="width:120px;" oninput="evaluateCheck4()">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="check-result result-wait" id="result4">等待填写</div>
+                        </div>
+                    </div>
+
+                    <!-- ⑤ ROE闸（可选） -->
+                    <div class="check-row">
+                        <div class="check-num" id="num5">5</div>
+                        <div class="check-content">
+                            <div class="check-label">
+                                ROE闸
+                                <span class="check-type type-quality">质量闸(可选)</span>
+                            </div>
+                            <div class="check-desc">近3个单季ROE B1→B2→B3，要求 B1≤B2≤B3。仅观察，不否决买入</div>
+                            <div class="form-row">
+                                <label>B1(前前季)</label>
+                                <input type="number" id="b1" placeholder="如：12.3" disabled style="width:120px;" oninput="evaluateCheck5()">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="form-row">
+                                <label>B2(前季)</label>
+                                <input type="number" id="b2" placeholder="如：11.8" disabled style="width:120px;" oninput="evaluateCheck5()">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="form-row">
+                                <label>B3(当季)</label>
+                                <input type="number" id="b3" placeholder="如：13.1" disabled style="width:120px;" oninput="evaluateCheck5()">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="check-result result-wait" id="result5">等待填写</div>
+                        </div>
+                    </div>
+
+                    <!-- ⑥ 仓位管理 -->
+                    <div class="check-row">
+                        <div class="check-num" id="num6">6</div>
+                        <div class="check-content">
+                            <div class="check-label">
+                                仓位管理
+                                <span class="check-type type-position">仓位</span>
+                            </div>
+                            <div class="check-desc">根据破净股占比自动判定当前可执行仓位档位</div>
+                            <div class="data-display" id="positionData">
+                                <div class="data-item">
+                                    <div class="label">当前档位</div>
+                                    <div class="value" id="positionLevel" style="font-size:14px;">未达标</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="label">建仓提示</div>
+                                    <div class="value" id="positionHint" style="font-size:14px;">破净股占比≥9%方可建仓</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 买入登记区 ========== -->
+        <div class="locked-overlay" id="tradeArea">
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-title">
+                        <span class="icon">💰</span>
+                        <span class="text">买入登记</span>
+                        <span class="tag" id="tradeTag">③④通过后解锁</span>
+                    </div>
+                </div>
+                <div class="module-body">
+                    <div class="form-row">
+                        <label>买入对象</label>
+                        <input type="text" id="buyTarget" placeholder="如：招商中证白酒指数A" disabled style="width:260px;">
+                    </div>
+                    <div class="form-row">
+                        <label>买入编码</label>
+                        <input type="text" id="buyCode" placeholder="如：161725" disabled style="width:160px;">
+                    </div>
+                    <div class="form-row">
+                        <label>买入金额</label>
+                        <input type="number" id="buyAmount" placeholder="如：50000" disabled style="width:160px;" oninput="calcUnitCost()">
+                        <span class="unit">元</span>
+                    </div>
+                    <div class="form-row">
+                        <label>买入数量</label>
+                        <input type="number" id="buyQuantity" placeholder="如：3846" disabled style="width:160px;" oninput="calcUnitCost()">
+                        <span class="unit">份</span>
+                    </div>
+                    <div class="form-row">
+                        <label>成本单价</label>
+                        <div class="computed" id="unitCost">--</div>
+                        <span class="unit">元/份</span>
+                    </div>
+                    <div class="form-row">
+                        <label>备注</label>
+                        <input type="text" id="buyNote" placeholder="可选" disabled style="width:300px;">
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="submit-btn disabled" id="submitBtn" onclick="submitRecord()">提交记录</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 历史记录 ========== -->
+        <div class="module">
+            <div class="module-header">
+                <div class="module-title">
+                    <span class="icon">📂</span>
+                    <span class="text">历史记录</span>
+                    <span class="tag" id="recordCount">0 条</span>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>目标</th>
+                            <th>买入对象</th>
+                            <th>买入编码</th>
+                            <th>金额</th>
+                            <th>数量</th>
+                            <th>成本单价</th>
+                            <th>仓位档位</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-hint" id="emptyHint" style="display:none;">暂无记录</div>
+            <div class="confirm-bar" id="confirmBar">
+                <span class="msg" id="confirmMsg"></span>
+                <button class="yes" id="confirmYes">确定</button>
+                <button class="no" onclick="hideConfirm()">取消</button>
+            </div>
+            <div class="action-bar">
+                <button class="action-btn" onclick="exportJSON()">📥 导出JSON</button>
+                <button class="action-btn" onclick="document.getElementById('importFile').click()">📤 导入JSON</button>
+                <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
+                <button class="action-btn" onclick="clearAllRecords()" style="color:#dc2626;border-color:#fca5a5;">🗑️ 清空全部</button>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <a href="../index.html" style="color:#2c5282;text-decoration:none;font-weight:500;margin-right:16px;">📈 估值报告</a>
+            <a href="../indicators.html" style="color:#2c5282;text-decoration:none;font-weight:500;margin-right:16px;">📋 指标说明</a>
+            | 投资有风险，入市需谨慎
+        </div>
+    </div>
+
+    <!-- 数据源引用 -->
+    <script src="../index_data_with_stars.js"></script>
+    <script src="../sub_tools/data/pjgzb_data.js"></script>
+
+    <script>
+        /* ========== Toast 提示 ========== */
+        let toastTimer = null;
+        function showToast(msg, type = 'success', onClick = null, duration = 2500) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast ' + type + ' show' + (onClick ? ' clickable' : '');
+            el.onclick = null; // 清除旧绑定
+            if (onClick) {
+                el.onclick = () => { onClick(); el.className = 'toast'; };
+                duration = 5000; // 可点击的 Toast 停留更久
+            }
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { el.className = 'toast'; el.onclick = null; }, duration);
+        }
+
+        /* ========== 内联确认栏 ========== */
+        let confirmCallback = null;
+        function showConfirm(msg, onConfirm) {
+            const bar = document.getElementById('confirmBar');
+            document.getElementById('confirmMsg').textContent = msg;
+            confirmCallback = onConfirm;
+            bar.classList.add('show');
+        }
+        function hideConfirm() {
+            document.getElementById('confirmBar').classList.remove('show');
+            confirmCallback = null;
+        }
+        document.getElementById('confirmYes').addEventListener('click', () => {
+            if (confirmCallback) confirmCallback();
+            hideConfirm();
+        });
+
+        /* ========== 全局状态 ========== */
+        const isTestMode = new URLSearchParams(window.location.search).get('test') === '1';
+        let valMode = 'percentile'; // 'percentile' | 'absolute'
+        let checkStates = { c1: false, c2: false, c3: false, c4: false, c5: null };
+        // c5: null=未填, true=通过, false=未通过（不否决）
+        let currentPosition = { level: '未达标', hint: '破净股占比≥9%方可建仓' };
+        let allIndexItems = []; // 所有指数数据缓存
+        let selectedTarget = null; // 当前选中的目标指数对象
+
+        /* ========== 初始化 ========== */
+        if (isTestMode) {
+            document.getElementById('testBanner').style.display = 'block';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            populateTargetDropdown();
+            evaluateMasterSwitches();
+            loadHistory();
+            checkBackupReminder();
+        });
+
+        /* ========== 备份提醒 ========== */
+        function checkBackupReminder() {
+            const records = getRecords();
+            if (records.length === 0) return; // 无记录不提醒
+            const lastExport = localStorage.getItem('checking_list_last_export');
+            if (!lastExport) {
+                // 从未导出过，有记录就提醒
+                document.getElementById('backupReminder').classList.add('show');
+                return;
+            }
+            const daysSince = (Date.now() - new Date(lastExport).getTime()) / (1000 * 60 * 60 * 24);
+            if (daysSince >= 7) {
+                document.getElementById('backupReminder').classList.add('show');
+            }
+        }
+
+        function dismissReminder() {
+            document.getElementById('backupReminder').classList.remove('show');
+        }
+
+        /* ========== 填充目标下拉菜单 ========== */
+        function populateTargetDropdown() {
+            const select = document.getElementById('targetSelect');
+            const items = (window.indexEvaData && window.indexEvaData.data && window.indexEvaData.data.items) || [];
+            allIndexItems = items;
+
+            if (items.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = '无可用指数数据';
+                select.appendChild(opt);
+                return;
+            }
+
+            // 按 name 排序，方便查找
+            const sorted = [...items].sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+            sorted.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.index_code;
+                opt.textContent = `${item.name}（${item.index_code}）`;
+                select.appendChild(opt);
+            });
+        }
+
+        /* ========== 选择目标指数联动 ========== */
+        function onTargetChange() {
+            const select = document.getElementById('targetSelect');
+            const code = select.value;
+            selectedTarget = allIndexItems.find(i => i.index_code === code) || null;
+
+            // 更新编码
+            const codeEl = document.getElementById('targetCode');
+            if (selectedTarget) {
+                codeEl.textContent = selectedTarget.index_code;
+            } else {
+                codeEl.textContent = '自动读取';
+            }
+
+            // 更新百分位模式数据
+            const pePDisplay = document.getElementById('pePercentileDisplay');
+            const pbPDisplay = document.getElementById('pbPercentileDisplay');
+            const peADisplay = document.getElementById('peAbsoluteDisplay');
+            const pbADisplay = document.getElementById('pbAbsoluteDisplay');
+
+            if (selectedTarget) {
+                const pePct = selectedTarget.pe_percentile;
+                const pbPct = selectedTarget.pb_percentile;
+                const peVal = selectedTarget.pe;
+                const pbVal = selectedTarget.pb;
+
+                pePDisplay.textContent = pePct != null && pePct > 0 ? (pePct * 100).toFixed(1) : '--';
+                pePDisplay.style.color = pePct != null && pePct > 0 ? (pePct <= 0.30 ? '#059669' : pePct <= 0.70 ? '#d97706' : '#dc2626') : '#94a3b8';
+                pbPDisplay.textContent = pbPct != null && pbPct > 0 ? (pbPct * 100).toFixed(1) : '--';
+                pbPDisplay.style.color = pbPct != null && pbPct > 0 ? (pbPct <= 0.30 ? '#059669' : pbPct <= 0.70 ? '#d97706' : '#dc2626') : '#94a3b8';
+
+                peADisplay.textContent = peVal != null && peVal > 0 ? peVal.toFixed(2) : '--';
+                peADisplay.style.color = '#1e3a5f';
+                pbADisplay.textContent = pbVal != null && pbVal > 0 ? pbVal.toFixed(2) : '--';
+                pbADisplay.style.color = '#1e3a5f';
+            } else {
+                pePDisplay.textContent = '--'; pePDisplay.style.color = '#94a3b8';
+                pbPDisplay.textContent = '--'; pbPDisplay.style.color = '#94a3b8';
+                peADisplay.textContent = '--'; peADisplay.style.color = '#94a3b8';
+                pbADisplay.textContent = '--'; pbADisplay.style.color = '#94a3b8';
+            }
+
+            evaluateCheck3();
+        }
+
+        /* ========== 主开关判定 ========== */
+        function evaluateMasterSwitches() {
+            // 获取数据
+            let hs300Pe, hs300Pb, zz500Pe, zz500Pb, pjgzbVal, pjgzbCount, pjgzbTotal;
+
+            if (isTestMode) {
+                // 测试模式：注入模拟数据
+                hs300Pe = 0.15; hs300Pb = 0.12;
+                zz500Pe = 0.08; zz500Pb = 0.05;
+                pjgzbVal = 0.095;
+                pjgzbCount = 525; pjgzbTotal = 5525;
+            } else {
+                // 正式模式：从数据文件读取
+                const items = (window.indexEvaData && window.indexEvaData.data && window.indexEvaData.data.items) || [];
+                const hs300 = items.find(i => i.index_code === 'SH000300');
+                const zz500 = items.find(i => i.index_code === 'SH000905');
+                hs300Pe = hs300 ? hs300.pe_percentile : null;
+                hs300Pb = hs300 ? hs300.pb_percentile : null;
+                zz500Pe = zz500 ? zz500.pe_percentile : null;
+                zz500Pb = zz500 ? zz500.pb_percentile : null;
+
+                const pjData = window.pjgzbData || {};
+                pjgzbVal = pjData['当前值'] || null;
+                pjgzbCount = pjData._extra ? pjData._extra['破净股数量'] : '--';
+                pjgzbTotal = pjData._extra ? pjData._extra['总股票数量'] : '--';
+            }
+
+            // ① 宽基双锚判定
+            const c1Pass = hs300Pe != null && hs300Pb != null && zz500Pe != null && zz500Pb != null
+                && hs300Pe <= 0.30 && hs300Pb <= 0.30 && zz500Pe <= 0.30 && zz500Pb <= 0.30;
+
+            // 渲染①数据
+            renderPercentile('hs300Pe', hs300Pe);
+            renderPercentile('hs300Pb', hs300Pb);
+            renderPercentile('zz500Pe', zz500Pe);
+            renderPercentile('zz500Pb', zz500Pb);
+            setResult('result1', 'num1', c1Pass, c1Pass ? '通过' : '未通过（需四项均≤30%）');
+            checkStates.c1 = c1Pass;
+
+            // ② 整体破净判定
+            const c2Pass = pjgzbVal != null && pjgzbVal >= 0.09;
+            document.getElementById('pjgzbValue').textContent = pjgzbVal != null ? (pjgzbVal * 100).toFixed(2) + '%' : '--';
+            document.getElementById('pjgzbValue').className = 'value ' + (pjgzbVal != null ? (pjgzbVal >= 0.09 ? 'green' : 'red') : '');
+            document.getElementById('pjgzbDetail').textContent = pjgzbCount != '--' ? `${pjgzbCount} / ${pjgzbTotal}` : '--';
+            setResult('result2', 'num2', c2Pass, c2Pass ? '通过（≥9%）' : '未通过（当前<9%）');
+            checkStates.c2 = c2Pass;
+
+            // 仓位档位判定
+            updatePosition(pjgzbVal);
+
+            // 主开关总体状态
+            const masterPass = c1Pass && c2Pass;
+            document.getElementById('masterSwitchStatus').textContent = masterPass ? '✅ 主开关通过' : '❌ 主开关未通过';
+
+            // 控制表单锁定
+            toggleLock(masterPass);
+        }
+
+        function renderPercentile(id, val) {
+            const el = document.getElementById(id);
+            if (val == null) { el.textContent = '--'; el.className = 'value'; return; }
+            el.textContent = (val * 100).toFixed(1) + '%';
+            el.className = 'value ' + (val <= 0.30 ? 'green' : val <= 0.70 ? 'yellow' : 'red');
+        }
+
+        function setResult(resultId, numId, pass, text) {
+            const resultEl = document.getElementById(resultId);
+            const numEl = document.getElementById(numId);
+            resultEl.className = 'check-result ' + (pass ? 'result-pass' : 'result-fail');
+            resultEl.textContent = (pass ? '✅ ' : '❌ ') + text;
+            numEl.className = 'check-num ' + (pass ? 'pass' : 'fail');
+        }
+
+        function setResultWarn(resultId, numId, pass, text) {
+            const resultEl = document.getElementById(resultId);
+            const numEl = document.getElementById(numId);
+            if (pass) {
+                resultEl.className = 'check-result result-pass';
+                resultEl.textContent = '✅ ' + text;
+                numEl.className = 'check-num pass';
+            } else {
+                resultEl.className = 'check-result result-warn';
+                resultEl.textContent = '⚠️ ' + text + '（不否决）';
+                numEl.className = 'check-num warn';
+            }
+        }
+
+        function setResultWait(resultId, numId, text) {
+            const resultEl = document.getElementById(resultId);
+            const numEl = document.getElementById(numId);
+            resultEl.className = 'check-result result-wait';
+            resultEl.textContent = text;
+            numEl.className = 'check-num';
+        }
+
+        /* ========== 仓位档位 ========== */
+        function updatePosition(pjgzbVal) {
+            const levelEl = document.getElementById('positionLevel');
+            const hintEl = document.getElementById('positionHint');
+            if (pjgzbVal == null || pjgzbVal < 0.09) {
+                currentPosition = { level: '未达标', hint: '破净股占比≥9%方可建仓' };
+            } else if (pjgzbVal < 0.10) {
+                currentPosition = { level: '试探性建仓', hint: '1/4仓 or 5万' };
+            } else if (pjgzbVal < 0.12) {
+                currentPosition = { level: '开始重仓', hint: '1/4仓 or 50万' };
+            } else {
+                currentPosition = { level: '重仓升级', hint: '1/4仓 or 50万' };
+            }
+            levelEl.textContent = currentPosition.level;
+            hintEl.textContent = currentPosition.hint;
+            levelEl.className = 'value ' + (pjgzbVal >= 0.09 ? 'green' : '');
+        }
+
+        /* ========== 锁定/解锁 ========== */
+        function toggleLock(masterPass) {
+            const checkArea = document.getElementById('checkArea');
+            const tradeArea = document.getElementById('tradeArea');
+            checkArea.className = masterPass ? 'locked-overlay unlocked' : 'locked-overlay';
+            tradeArea.className = masterPass ? 'locked-overlay unlocked' : 'locked-overlay';
+
+            // 启用/禁用检查项输入
+            const fields = ['peThreshold', 'pbThreshold',
+                            'a1', 'a2', 'a3', 'b1', 'b2', 'b3',
+                            'buyTarget', 'buyCode', 'buyAmount', 'buyQuantity', 'buyNote'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.disabled = !masterPass;
+            });
+            // 下拉菜单单独处理
+            document.getElementById('targetSelect').disabled = !masterPass;
+
+            if (!masterPass) {
+                // 重置检查项状态
+                setResultWait('result3', 'num3', '等待主开关通过');
+                setResultWait('result4', 'num4', '等待主开关通过');
+                setResultWait('result5', 'num5', '等待主开关通过');
+                checkStates.c3 = false;
+                checkStates.c4 = false;
+                checkStates.c5 = null;
+                updateSubmitBtn();
+            } else {
+                setResultWait('result3', 'num3', '等待选择');
+                setResultWait('result4', 'num4', '等待填写');
+                setResultWait('result5', 'num5', '等待填写');
+            }
+        }
+
+        /* ========== ③ 目标估值判定 ========== */
+        function switchValMode(mode) {
+            valMode = mode;
+            document.getElementById('modePercentile').className = 'mode-btn' + (mode === 'percentile' ? ' active' : '');
+            document.getElementById('modeAbsolute').className = 'mode-btn' + (mode === 'absolute' ? ' active' : '');
+            document.getElementById('percentileFields').style.display = mode === 'percentile' ? 'block' : 'none';
+            document.getElementById('absoluteFields').style.display = mode === 'absolute' ? 'block' : 'none';
+            evaluateCheck3();
+        }
+
+        function evaluateCheck3() {
+            if (!checkStates.c1 || !checkStates.c2) return;
+
+            if (!selectedTarget) {
+                setResultWait('result3', 'num3', '请选择目标指数');
+                checkStates.c3 = false;
+                updateSubmitBtn();
+                return;
+            }
+
+            let pass = false;
+            let detail = '';
+
+            if (valMode === 'percentile') {
+                const pePct = selectedTarget.pe_percentile;
+                const pbPct = selectedTarget.pb_percentile;
+                // PE=0 或 PB=0 视为无数据
+                if (pePct == null || pePct <= 0 || pbPct == null || pbPct <= 0) {
+                    setResultWait('result3', 'num3', '该指数PE/PB百分位数据缺失');
+                    checkStates.c3 = false;
+                    updateSubmitBtn();
+                    return;
+                }
+                pass = pePct <= 0.30 && pbPct <= 0.30;
+                const peStr = (pePct * 100).toFixed(1);
+                const pbStr = (pbPct * 100).toFixed(1);
+                detail = pass
+                    ? `通过（PE${peStr}%≤30% 且 PB${pbStr}%≤30%）`
+                    : `未通过（PE${peStr}%或PB${pbStr}%>30%）`;
+            } else {
+                // 绝对值模式：PE/PB自动读取，阈值手动输入
+                const peVal = selectedTarget.pe;
+                const pbVal = selectedTarget.pb;
+                const peT = document.getElementById('peThreshold').value.trim();
+                const pbT = document.getElementById('pbThreshold').value.trim();
+
+                if (!peT && !pbT) {
+                    setResultWait('result3', 'num3', '至少填写一个阈值');
+                    checkStates.c3 = false;
+                    updateSubmitBtn();
+                    return;
+                }
+
+                let peOk = true, pbOk = true;
+                const parts = [];
+                if (peT && peVal != null && peVal > 0) {
+                    peOk = peVal <= parseFloat(peT);
+                    parts.push(`PE${peVal.toFixed(2)}≤${peT}:${peOk ? '✓' : '✗'}`);
+                } else if (peT) {
+                    parts.push('PE数据缺失');
+                }
+                if (pbT && pbVal != null && pbVal > 0) {
+                    pbOk = pbVal <= parseFloat(pbT);
+                    parts.push(`PB${pbVal.toFixed(2)}≤${pbT}:${pbOk ? '✓' : '✗'}`);
+                } else if (pbT) {
+                    parts.push('PB数据缺失');
+                }
+
+                pass = peOk && pbOk && parts.length > 0;
+                detail = pass ? `通过（${parts.join('，')}）` : `未通过（${parts.join('，')}）`;
+            }
+            setResult('result3', 'num3', pass, detail);
+            checkStates.c3 = pass;
+            updateSubmitBtn();
+        }
+
+        /* ========== ④ 盈利趋势判定 ========== */
+        function evaluateCheck4() {
+            if (!checkStates.c1 || !checkStates.c2) return;
+            const a1 = parseFloat(document.getElementById('a1').value);
+            const a2 = parseFloat(document.getElementById('a2').value);
+            const a3 = parseFloat(document.getElementById('a3').value);
+            if (isNaN(a1) || isNaN(a2) || isNaN(a3)) {
+                setResultWait('result4', 'num4', '等待填写');
+                checkStates.c4 = false;
+                updateSubmitBtn();
+                return;
+            }
+            const pass = a1 <= a2 && a2 <= a3;
+            const detail = pass
+                ? `通过（${a1}%→${a2}%→${a3}%，趋势未恶化）`
+                : `未通过（${a1}%→${a2}%→${a3}%，趋势恶化）`;
+            setResult('result4', 'num4', pass, detail);
+            checkStates.c4 = pass;
+            updateSubmitBtn();
+        }
+
+        /* ========== ⑤ ROE闸判定 ========== */
+        function evaluateCheck5() {
+            if (!checkStates.c1 || !checkStates.c2) return;
+            const b1 = parseFloat(document.getElementById('b1').value);
+            const b2 = parseFloat(document.getElementById('b2').value);
+            const b3 = parseFloat(document.getElementById('b3').value);
+            if (isNaN(b1) || isNaN(b2) || isNaN(b3)) {
+                setResultWait('result5', 'num5', '等待填写（可选）');
+                checkStates.c5 = null;
+                return;
+            }
+            const pass = b1 <= b2 && b2 <= b3;
+            const detail = pass
+                ? `通过（${b1}%→${b2}%→${b3}%，ROE未恶化）`
+                : `ROE恶化（${b1}%→${b2}%→${b3}%）`;
+            setResultWarn('result5', 'num5', pass, detail);
+            checkStates.c5 = pass;
+        }
+
+        /* ========== 成本单价计算 ========== */
+        function calcUnitCost() {
+            const amount = parseFloat(document.getElementById('buyAmount').value);
+            const quantity = parseFloat(document.getElementById('buyQuantity').value);
+            const el = document.getElementById('unitCost');
+            if (!isNaN(amount) && !isNaN(quantity) && quantity > 0) {
+                el.textContent = (amount / quantity).toFixed(4);
+            } else {
+                el.textContent = '--';
+            }
+        }
+
+        /* ========== 实时清除 missing 标记 ========== */
+        function clearMissingOnInput(fieldId) {
+            const el = document.getElementById(fieldId);
+            if (el) {
+                el.addEventListener('input', () => el.classList.remove('missing'));
+            }
+        }
+        ['buyTarget', 'buyCode', 'buyAmount', 'buyQuantity'].forEach(clearMissingOnInput);
+
+        /* ========== 提交按钮状态 ========== */
+        function updateSubmitBtn() {
+            const btn = document.getElementById('submitBtn');
+            const tag = document.getElementById('tradeTag');
+            const canSubmit = checkStates.c1 && checkStates.c2 && checkStates.c3 && checkStates.c4;
+            btn.className = 'submit-btn ' + (canSubmit ? 'enabled' : 'disabled');
+            tag.textContent = canSubmit ? '可提交' : '③④通过后解锁';
+        }
+
+        /* ========== 提交记录 ========== */
+        function submitRecord() {
+            if (!checkStates.c1 || !checkStates.c2 || !checkStates.c3 || !checkStates.c4) return;
+
+            // 校验买入登记必填字段
+            const requiredFields = [
+                { id: 'buyTarget', label: '买入对象' },
+                { id: 'buyCode', label: '买入编码' },
+                { id: 'buyAmount', label: '买入金额' },
+                { id: 'buyQuantity', label: '买入数量' }
+            ];
+
+            // 清除旧标记
+            requiredFields.forEach(f => {
+                document.getElementById(f.id).classList.remove('missing');
+            });
+
+            const missing = requiredFields.filter(f => {
+                const el = document.getElementById(f.id);
+                const val = el.value.trim();
+                return !val || (el.type === 'number' && (isNaN(parseFloat(val)) || parseFloat(val) <= 0));
+            });
+
+            if (missing.length > 0) {
+                // 标记未填字段
+                missing.forEach(f => {
+                    document.getElementById(f.id).classList.add('missing');
+                });
+                showToast('请填写：' + missing.map(f => f.label).join('、'), 'error');
+                // 聚焦第一个未填字段
+                document.getElementById(missing[0].id).focus();
+                return;
+            }
+
+            const now = new Date();
+            const timestamp = now.getFullYear() + '-' +
+                String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                String(now.getDate()).padStart(2, '0') + ' ' +
+                String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0') + ':' +
+                String(now.getSeconds()).padStart(2, '0');
+            const dateCompact = timestamp.replace(/[-: ]/g, '').substring(0, 8);
+
+            const amount = parseFloat(document.getElementById('buyAmount').value) || 0;
+            const quantity = parseFloat(document.getElementById('buyQuantity').value) || 0;
+            const unitCost = quantity > 0 ? (amount / quantity).toFixed(4) : 0;
+
+            // 构建估值数据
+            let valuation = {};
+            if (valMode === 'percentile') {
+                valuation = {
+                    mode: 'percentile',
+                    pePercentile: selectedTarget ? selectedTarget.pe_percentile : 0,
+                    pbPercentile: selectedTarget ? selectedTarget.pb_percentile : 0
+                };
+            } else {
+                valuation = {
+                    mode: 'absolute',
+                    pe: selectedTarget ? selectedTarget.pe : '',
+                    pb: selectedTarget ? selectedTarget.pb : '',
+                    peThreshold: document.getElementById('peThreshold').value || '',
+                    pbThreshold: document.getElementById('pbThreshold').value || ''
+                };
+            }
+
+            const targetName = selectedTarget ? selectedTarget.name : '';
+            const targetCode = selectedTarget ? selectedTarget.index_code : '';
+
+            const record = {
+                id: dateCompact + '_' + String(now.getTime()).slice(-6),
+                timestamp: timestamp,
+                date: dateCompact,
+                checkResults: {
+                    wideAnchor: { passed: checkStates.c1 },
+                    brokenNet: { passed: checkStates.c2 },
+                    target: {
+                        name: targetName,
+                        code: targetCode,
+                        valuation: valuation,
+                        passed: checkStates.c3
+                    },
+                    profitTrend: {
+                        a1: parseFloat(document.getElementById('a1').value) || 0,
+                        a2: parseFloat(document.getElementById('a2').value) || 0,
+                        a3: parseFloat(document.getElementById('a3').value) || 0,
+                        passed: checkStates.c4
+                    },
+                    roeGate: {
+                        b1: parseFloat(document.getElementById('b1').value) || null,
+                        b2: parseFloat(document.getElementById('b2').value) || null,
+                        b3: parseFloat(document.getElementById('b3').value) || null,
+                        passed: checkStates.c5
+                    },
+                    position: { level: currentPosition.level, hint: currentPosition.hint }
+                },
+                trade: {
+                    target: targetName,
+                    code: targetCode,
+                    buyTarget: document.getElementById('buyTarget').value || '',
+                    buyCode: document.getElementById('buyCode').value || '',
+                    amount: amount,
+                    quantity: quantity,
+                    unitCost: unitCost,
+                    note: document.getElementById('buyNote').value || ''
+                }
+            };
+
+            // 保存到 localStorage
+            const records = getRecords();
+            records.unshift(record); // 最新的在最前
+            localStorage.setItem('checking_list_records', JSON.stringify(records));
+
+            // 清空表单
+            resetForm();
+            loadHistory();
+            showToast('提交成功！点击导出备份 →', 'success', exportJSON);
+        }
+
+        function resetForm() {
+            // 重置下拉菜单
+            document.getElementById('targetSelect').value = '';
+            document.getElementById('targetCode').textContent = '自动读取';
+            selectedTarget = null;
+
+            // 重置自动填充的显示值
+            ['pePercentileDisplay', 'pbPercentileDisplay', 'peAbsoluteDisplay', 'pbAbsoluteDisplay'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.textContent = '--'; el.style.color = '#94a3b8'; }
+            });
+
+            ['peThreshold', 'pbThreshold',
+             'a1', 'a2', 'a3', 'b1', 'b2', 'b3',
+             'buyTarget', 'buyCode', 'buyAmount', 'buyQuantity', 'buyNote'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.value = ''; el.classList.remove('missing'); }
+            });
+            document.getElementById('unitCost').textContent = '--';
+            setResultWait('result3', 'num3', '等待选择');
+            setResultWait('result4', 'num4', '等待填写');
+            setResultWait('result5', 'num5', '等待填写（可选）');
+            checkStates.c3 = false;
+            checkStates.c4 = false;
+            checkStates.c5 = null;
+            updateSubmitBtn();
+        }
+
+        /* ========== 历史记录 ========== */
+        function getRecords() {
+            try {
+                return JSON.parse(localStorage.getItem('checking_list_records') || '[]');
+            } catch { return []; }
+        }
+
+        function loadHistory() {
+            const records = getRecords();
+            const tbody = document.getElementById('historyBody');
+            const emptyHint = document.getElementById('emptyHint');
+            const countTag = document.getElementById('recordCount');
+
+            countTag.textContent = records.length + ' 条';
+
+            if (records.length === 0) {
+                tbody.innerHTML = '';
+                emptyHint.style.display = 'block';
+                return;
+            }
+            emptyHint.style.display = 'none';
+
+            tbody.innerHTML = records.map(r => `
+                <tr>
+                    <td>${r.date}</td>
+                    <td style="font-weight:600;color:#1e3a5f;">${r.trade.target || '--'}</td>
+                    <td style="color:#374151;">${r.trade.buyTarget || '--'}</td>
+                    <td style="color:#94a3b8;font-size:13px;">${r.trade.buyCode || '--'}</td>
+                    <td>${r.trade.amount ? r.trade.amount.toLocaleString() : '--'}</td>
+                    <td>${r.trade.quantity ? r.trade.quantity.toLocaleString() : '--'}</td>
+                    <td>${r.trade.unitCost || '--'}</td>
+                    <td><span style="font-size:12px;padding:2px 8px;border-radius:4px;background:#d1fae5;color:#065f46;">${r.checkResults.position.level}</span></td>
+                    <td style="color:#94a3b8;font-size:13px;">${r.trade.note || ''}</td>
+                    <td><button class="del-btn" onclick="deleteRecord('${r.id}')">删除</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteRecord(id) {
+            showConfirm('确定删除此条记录？', () => {
+                const records = getRecords().filter(r => r.id !== id);
+                localStorage.setItem('checking_list_records', JSON.stringify(records));
+                loadHistory();
+                showToast('已删除，建议导出备份 →', 'warn', exportJSON);
+            });
+        }
+
+        function clearAllRecords() {
+            const records = getRecords();
+            if (records.length === 0) { showToast('暂无记录', 'warn'); return; }
+            showConfirm(`确定清空全部 ${records.length} 条记录？此操作不可撤销！`, () => {
+                localStorage.removeItem('checking_list_records');
+                loadHistory();
+                showToast('已清空全部记录', 'success');
+            });
+        }
+
+        /* ========== JSON 导出/导入 ========== */
+        function exportJSON() {
+            const records = getRecords();
+            if (records.length === 0) { showToast('暂无记录可导出', 'warn'); return; }
+            const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `checking_list_records_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            // 记录导出时间，隐藏提醒条
+            localStorage.setItem('checking_list_last_export', new Date().toISOString());
+            document.getElementById('backupReminder').classList.remove('show');
+            showToast('导出成功', 'success');
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (!Array.isArray(imported)) { showToast('文件格式错误：需为JSON数组', 'error'); return; }
+                    const existing = getRecords();
+                    const existingIds = new Set(existing.map(r => r.id));
+                    let added = 0;
+                    imported.forEach(r => {
+                        if (r.id && !existingIds.has(r.id)) {
+                            existing.push(r);
+                            added++;
+                        }
+                    });
+                    // 按时间倒序排列
+                    existing.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+                    localStorage.setItem('checking_list_records', JSON.stringify(existing));
+                    loadHistory();
+                    showToast(`导入完成：新增 ${added} 条，跳过 ${imported.length - added} 条`, 'success');
+                } catch (err) {
+                    showToast('导入失败：' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // 重置，允许重复选择同一文件
+        }
+    </script>
+</body>
+</html>
