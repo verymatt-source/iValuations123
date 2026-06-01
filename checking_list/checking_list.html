@@ -471,12 +471,12 @@
                         </div>
                     </div>
 
-                    <!-- ④ 盈利趋势(E) -->
+                    <!-- ④ 单季盈利(E) -->
                     <div class="check-row">
                         <div class="check-num" id="num4">4</div>
                         <div class="check-content">
                             <div class="check-label">
-                                盈利趋势(E)
+                                单季盈利(E)
                                 <span class="check-type type-quality">质量闸</span>
                             </div>
                             <div class="check-desc">近3个单季净利润同比增速 A1→A2→A3，要求 A1≤A2≤A3（跌幅未扩大/增速提升）</div>
@@ -499,12 +499,12 @@
                         </div>
                     </div>
 
-                    <!-- ⑤ ROE闸（可选） -->
+                    <!-- ⑤ 单季ROE(E)（可选） -->
                     <div class="check-row">
                         <div class="check-num" id="num5">5</div>
                         <div class="check-content">
                             <div class="check-label">
-                                ROE闸
+                                单季ROE(E)
                                 <span class="check-type type-quality">质量闸(可选)</span>
                             </div>
                             <div class="check-desc">近3个单季ROE B1→B2→B3，要求 B1≤B2≤B3。仅观察，不否决买入</div>
@@ -730,18 +730,20 @@
         function populateTargetDropdown() {
             const select = document.getElementById('targetSelect');
             const items = (window.indexEvaData && window.indexEvaData.data && window.indexEvaData.data.items) || [];
+            // 只保留低估指数
+            const undervalued = items.filter(i => i.eva_type === 'low');
             allIndexItems = items;
 
-            if (items.length === 0) {
+            if (undervalued.length === 0) {
                 const opt = document.createElement('option');
                 opt.value = '';
-                opt.textContent = '无可用指数数据';
+                opt.textContent = '当前无低估指数';
                 select.appendChild(opt);
                 return;
             }
 
             // 按 name 排序，方便查找
-            const sorted = [...items].sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+            const sorted = [...undervalued].sort((a, b) => a.name.localeCompare(b.name, 'zh'));
             sorted.forEach(item => {
                 const opt = document.createElement('option');
                 opt.value = item.index_code;
@@ -1039,7 +1041,7 @@
             updateSubmitBtn();
         }
 
-        /* ========== ⑤ ROE闸判定 ========== */
+        /* ========== ⑤ 单季ROE(E)判定 ========== */
         function evaluateCheck5() {
             if (!checkStates.c1 || !checkStates.c2) return;
             const b1 = parseFloat(document.getElementById('b1').value);
