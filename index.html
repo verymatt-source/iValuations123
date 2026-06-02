@@ -204,6 +204,30 @@
         .stats-row .stat.yellow .num { color: #d97706; }
         .stats-row .stat.red .num { color: #dc2626; }
 
+        /* ========== 买入信号提示条 ========== */
+        #buySignalBanner {
+            padding: 14px 24px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            color: #065f46;
+            border-top: 1px solid #a7f3d0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #buySignalBanner:hover {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+        #buySignalBanner .arrow {
+            margin-left: 6px;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        #buySignalBanner:hover .arrow {
+            transform: translateX(4px);
+        }
+
         /* ========== 筛选器 ========== */
         .filters {
             display: flex;
@@ -320,6 +344,8 @@
         <!-- ========== 核心概览模块 ========== -->
         <div class="module">
             <div class="stats-row" id="summaryBar" style="border-bottom: none;"></div>
+            <!-- 买入信号提示条（条件满足时显示） -->
+            <div id="buySignalBanner" style="display:none;"></div>
         </div>
 
         <!-- ========== 重点监测模块 ========== -->
@@ -500,6 +526,27 @@
         let sortField = 'name', sortOrder = 'asc';
         let monitorSortField = '比例', monitorSortOrder = 'asc';
         let marketSortField = 'name', marketSortOrder = 'asc';
+
+        // ========== ?test=1 模拟数据注入 ==========
+        // 访问 index.html?test=1 启用测试模式
+        (function injectTestData() {
+            if (new URLSearchParams(location.search).get('test') !== '1') return;
+            // 覆盖破净股 => 9.5%（触发>=9%条件）
+            if (window.pjgzbData) {
+                window.pjgzbData['当前值'] = 0.095;
+                window.pjgzbData['目标值'] = 0.1;
+                window.pjgzbData['比例'] = (0.095 - 0.1) / 0.1;
+            }
+            // 覆盖沪深300/中证500 PE/PB百分位 => 均<=30%
+            data.forEach(item => {
+                if (item.index_code === 'SH000300' || item.index_code === 'SH000905') {
+                    item.pe_percentile = 0.20;
+                    item.pb_percentile = 0.25;
+                    item.eva_type = 'low';
+                }
+            });
+            console.log('[TestMode] 模拟数据已注入：破净股9.5%，沪深300/中证500百分位20%/25%');
+        })();
         
         // 显示时间和数据更新时间
         function renderTimeInfo() {
@@ -874,6 +921,30 @@
                     <div class="label" style="font-size:12px; margin-top:8px;">(目标6%为极度低估)</div>
                 </div>
             `;
+
+            // ========== 买入信号横幅 ==========
+            // 条件1：破净股占比 >= 9%
+            const pjgzbVal = window.pjgzbData && window.pjgzbData['当前值'] !== undefined
+                ? window.pjgzbData['当前值'] : null;
+            const cond1 = pjgzbVal !== null && pjgzbVal >= 0.09;
+
+            // 条件2：宽基双锚 沪深300 + 中证500 PE百分位 AND PB百分位 同时 <=30%
+            const hs300 = data.find(d => d.index_code === 'SH000300');
+            const zz500 = data.find(d => d.index_code === 'SH000905');
+            const cond2 = hs300 && zz500
+                && (hs300.pe_percentile || 0) <= 0.30
+                && (hs300.pb_percentile || 0) <= 0.30
+                && (zz500.pe_percentile || 0) <= 0.30
+                && (zz500.pb_percentile || 0) <= 0.30;
+
+            const banner = document.getElementById('buySignalBanner');
+            if (cond1 && cond2) {
+                banner.style.display = 'block';
+                banner.innerHTML = '🟢 遵循买入检查清单，规避估值陷阱 <span class="arrow">&gt;&gt;</span>';
+                banner.onclick = () => window.location.href = 'checking_list/checking_list.html';
+            } else {
+                banner.style.display = 'none';
+            }
         }
 
         renderSummaryBar();
