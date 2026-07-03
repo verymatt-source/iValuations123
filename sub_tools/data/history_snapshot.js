@@ -14912,8 +14912,8 @@ window.historySnapshot = [
   },
   {
     "snapshot_date": "2026-07-03",
-    "snapshot_time": "09:40",
-    "timestamp": 1783042819,
+    "snapshot_time": "10:27",
+    "timestamp": 1783045676,
     "key_markets": [
       {
         "id": 511604,
@@ -14937,9 +14937,9 @@ window.historySnapshot = [
         "peg": 1.5339,
         "pb_flag": false,
         "source": "5",
-        "date": "07-02",
         "pb_over_history": 0.4356,
         "pe_over_history": 0.3708,
+        "date": "07-02",
         "star": 2
       },
       {
@@ -14964,9 +14964,9 @@ window.historySnapshot = [
         "peg": 0.9369,
         "pb_flag": false,
         "source": "5",
-        "date": "07-02",
         "pb_over_history": 0.5552,
         "pe_over_history": 0.1588,
+        "date": "07-02",
         "star": 2
       },
       {
@@ -14991,9 +14991,9 @@ window.historySnapshot = [
         "peg": 0.8298,
         "pb_flag": false,
         "source": "5",
-        "date": "07-02",
         "pb_over_history": 0.13,
         "pe_over_history": 0.1076,
+        "date": "07-02",
         "star": 2
       },
       {
@@ -15018,9 +15018,9 @@ window.historySnapshot = [
         "peg": 0.7173,
         "pb_flag": false,
         "source": "5",
-        "date": "07-02",
         "pb_over_history": 0.176,
         "pe_over_history": 0.328,
+        "date": "07-02",
         "star": 2
       },
       {
@@ -15045,9 +15045,9 @@ window.historySnapshot = [
         "peg": 1.0888,
         "pb_flag": false,
         "source": "5",
-        "date": "07-02",
         "pb_over_history": 0.0089,
         "pe_over_history": 0.0044,
+        "date": "07-02",
         "star": 2
       }
     ],
@@ -15071,8 +15071,8 @@ window.historySnapshot = [
         "名称": "可转债均价",
         "编码": "KZZJJ",
         "目标值": 115,
-        "当前值": 165.70777450980384,
-        "比例": 0.4409371696504682,
+        "当前值": 165.22147712418297,
+        "比例": 0.43670849673202583,
         "备注": "",
         "分组": "核心指标",
         "更新时间": "2026-07-03"
@@ -15081,11 +15081,11 @@ window.historySnapshot = [
         "名称": "美元兑人民币",
         "编码": "USDCNY",
         "目标值": 6.8,
-        "当前值": 6.7807,
-        "比例": -0.002838235294117563,
+        "当前值": 6.7789,
+        "比例": -0.0031029411764705406,
         "备注": "",
         "分组": "全球",
-        "更新时间": "2026-07-03 09:39:49"
+        "更新时间": "2026-07-03 10:27:18"
       },
       "Shiller PE": {
         "名称": "Shiller PE",
@@ -15106,7 +15106,7 @@ window.historySnapshot = [
         "方向": "low",
         "备注": "",
         "分组": "全球",
-        "更新时间": "2026-07-03 09:40"
+        "更新时间": "2026-07-03 10:27"
       },
       "中证煤炭PB": {
         "名称": "中证煤炭PB",
