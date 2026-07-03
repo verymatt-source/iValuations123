@@ -563,6 +563,12 @@
                     </div>
                 </div>
                 <div class="module-body">
+                    <!-- 金额规则备注 -->
+                    <div style="background:#f0f4f8;border-left:3px solid #2c5282;border-radius:6px;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#475569;line-height:1.8;">
+                        <strong>📋 金额规则：</strong>
+                        破净股占比 9%~10% → 单笔买入上限 <strong style="color:#d97706;">5万元</strong>；
+                        破净股占比 ≥10% → 单笔买入上限 <strong style="color:#059669;">50万元</strong>
+                    </div>
                     <div class="form-row">
                         <label>买入对象</label>
                         <input type="text" id="buyTarget" placeholder="如：招商中证白酒指数A" disabled style="width:260px;">
@@ -649,8 +655,8 @@
     </div>
 
     <!-- 数据源引用 -->
-    <script src="../index_data_with_stars.js"></script>
-    <script src="../sub_tools/data/pjgzb_data.js"></script>
+    <script src="../index_data_with_stars.js?v=20260703"></script>
+    <script src="../sub_tools/data/pjgzb_data.js?v=20260703"></script>
 
     <script>
         /* ========== Toast 提示 ========== */
@@ -691,6 +697,7 @@
         let checkStates = { c1: false, c2: false, c3: false, c4: false, c5: null };
         // c5: null=未填, true=通过, false=未通过（不否决）
         let currentPosition = { level: '未达标', hint: '破净股占比≥9%方可建仓' };
+        let currentPjgzbVal = null; // 当前破净股占比（全局，供金额校验用）
         let allIndexItems = []; // 所有指数数据缓存
         let selectedTarget = null; // 当前选中的目标指数对象
 
@@ -843,6 +850,7 @@
             document.getElementById('pjgzbDetail').textContent = pjgzbCount != '--' ? `${pjgzbCount} / ${pjgzbTotal}` : '--';
             setResult('result2', 'num2', c2Pass, c2Pass ? '通过（≥9%）' : '未通过（当前<9%）');
             checkStates.c2 = c2Pass;
+            currentPjgzbVal = pjgzbVal;
 
             // 仓位档位判定
             updatePosition(pjgzbVal);
@@ -1122,6 +1130,26 @@
                 // 聚焦第一个未填字段
                 document.getElementById(missing[0].id).focus();
                 return;
+            }
+
+            // 金额校验：根据破净股占比限制买入额度
+            const buyAmountVal = parseFloat(document.getElementById('buyAmount').value);
+            if (currentPjgzbVal != null) {
+                let maxAmount = 0;
+                let amountRule = '';
+                if (currentPjgzbVal >= 0.10) {
+                    maxAmount = 500000;
+                    amountRule = `破净股占比${(currentPjgzbVal * 100).toFixed(2)}%≥10%，单笔买入上限50万元`;
+                } else if (currentPjgzbVal >= 0.09) {
+                    maxAmount = 50000;
+                    amountRule = `破净股占比${(currentPjgzbVal * 100).toFixed(2)}%（9%~10%），单笔买入上限5万元`;
+                }
+                if (maxAmount > 0 && buyAmountVal > maxAmount) {
+                    showToast(`金额超限：${amountRule}，当前${buyAmountVal.toLocaleString()}元`, 'error', null, 5000);
+                    document.getElementById('buyAmount').classList.add('missing');
+                    document.getElementById('buyAmount').focus();
+                    return;
+                }
             }
 
             const now = new Date();
