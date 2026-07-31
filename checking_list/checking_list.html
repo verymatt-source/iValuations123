@@ -479,7 +479,7 @@
                                 单季盈利(E)
                                 <span class="check-type type-quality">质量闸</span>
                             </div>
-                            <div class="check-desc">近3个单季净利润同比增速 A1→A2→A3，要求 A1≤A2≤A3（跌幅未扩大/增速提升）</div>
+                            <div class="check-desc">近3个单季净利润同比增速 A1→A2→A3，要求相邻两期下滑不超过20%。若A3≥A2近期向好应加分</div>
                             <div class="form-row">
                                 <label>A1(前前季)</label>
                                 <input type="number" id="a1" placeholder="如：-8.2" disabled style="width:120px;" oninput="evaluateCheck4()">
@@ -507,7 +507,7 @@
                                 单季ROE(E)
                                 <span class="check-type type-quality">质量闸(可选)</span>
                             </div>
-                            <div class="check-desc">近3个单季ROE B1→B2→B3，要求 B1≤B2≤B3。仅观察，不否决买入</div>
+                            <div class="check-desc">近3个单季ROE B1→B2→B3，要求相邻两期下滑不超过20%。若B3≥B2近期向好应加分。仅观察，不否决买入</div>
                             <div class="form-row">
                                 <label>B1(前前季)</label>
                                 <input type="number" id="b1" placeholder="如：12.3" disabled style="width:120px;" oninput="evaluateCheck5()">
@@ -1040,10 +1040,10 @@
                 updateSubmitBtn();
                 return;
             }
-            const pass = a1 <= a2 && a2 <= a3;
+            const pass = (a1 - a2) <= 20 && (a2 - a3) <= 20;
             const detail = pass
-                ? `通过（${a1}%→${a2}%→${a3}%，趋势未恶化）`
-                : `未通过（${a1}%→${a2}%→${a3}%，趋势恶化）`;
+                ? `通过（${a1}%→${a2}%→${a3}%，无断崖下跌）`
+                : `未通过（${a1}%→${a2}%→${a3}%，相邻期下滑超20%）`;
             setResult('result4', 'num4', pass, detail);
             checkStates.c4 = pass;
             updateSubmitBtn();
@@ -1060,10 +1060,10 @@
                 checkStates.c5 = null;
                 return;
             }
-            const pass = b1 <= b2 && b2 <= b3;
+            const pass = (b1 - b2) <= 20 && (b2 - b3) <= 20;
             const detail = pass
-                ? `通过（${b1}%→${b2}%→${b3}%，ROE未恶化）`
-                : `ROE恶化（${b1}%→${b2}%→${b3}%）`;
+                ? `通过（${b1}%→${b2}%→${b3}%，无断崖下跌）`
+                : `ROE下滑超20%（${b1}%→${b2}%→${b3}%）`;
             setResultWarn('result5', 'num5', pass, detail);
             checkStates.c5 = pass;
         }
