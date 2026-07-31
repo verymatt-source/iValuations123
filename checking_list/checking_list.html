@@ -246,30 +246,31 @@
         /* ========== 备份提醒条 ========== */
         .backup-reminder {
             display: none;
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
+            background: #fef2f2;
+            border: 2px solid #dc2626;
             border-radius: 8px;
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #92400e;
+            padding: 16px 20px;
+            margin: 20px 0;
+            font-size: 15px;
+            color: #991b1b;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
         }
         .backup-reminder.show { display: flex; }
         .backup-reminder .reminder-text { flex: 1; font-weight: 500; }
         .backup-reminder .reminder-btn {
             padding: 6px 16px; border: none; border-radius: 6px;
-            background: #d97706; color: #fff; font-size: 13px; font-weight: 600;
+            background: #dc2626; color: #fff; font-size: 13px; font-weight: 600;
             cursor: pointer; white-space: nowrap; transition: background 0.2s;
         }
-        .backup-reminder .reminder-btn:hover { background: #b45309; }
+        .backup-reminder .reminder-btn:hover { background: #b91c1c; }
         .backup-reminder .reminder-close {
             padding: 4px 8px; border: none; background: transparent;
-            color: #92400e; font-size: 16px; cursor: pointer; line-height: 1;
+            color: #991b1b; font-size: 16px; cursor: pointer; line-height: 1;
         }
-        .backup-reminder .reminder-close:hover { color: #78350f; }
+        .backup-reminder .reminder-close:hover { color: #7f1d1d; }
 
         /* ========== 内联确认栏 ========== */
         .confirm-bar {
@@ -316,13 +317,6 @@
 
         <!-- 测试模式提示 -->
         <div class="test-banner" id="testBanner">⚠️ 测试模式（模拟数据）</div>
-
-        <!-- 备份提醒条 -->
-        <div class="backup-reminder" id="backupReminder">
-            <span class="reminder-text">⏰ 已超过 7 天未导出备份，建议立即导出以防数据丢失</span>
-            <button class="reminder-btn" onclick="exportJSON()">📥 立即导出</button>
-            <button class="reminder-close" onclick="dismissReminder()" title="关闭提醒">✕</button>
-        </div>
 
         <!-- ========== 主开关区 ========== -->
         <div class="module">
@@ -646,6 +640,13 @@
             </div>
         </div>
 
+        <!-- 备份提醒条 -->
+        <div class="backup-reminder" id="backupReminder">
+            <span class="reminder-text">🚨 记录仅保存在浏览器本地，请定期导出 JSON 备份，避免清缓存或换设备导致数据丢失</span>
+            <button class="reminder-btn" onclick="exportJSON()">📥 立即导出</button>
+            <button class="reminder-close" onclick="dismissReminder()" title="关闭提醒">✕</button>
+        </div>
+
         <!-- 页脚 -->
         <div class="footer">
             <a href="../index.html" style="color:#2c5282;text-decoration:none;font-weight:500;margin-right:16px;">📈 估值报告</a>
@@ -717,16 +718,7 @@
         function checkBackupReminder() {
             const records = getRecords();
             if (records.length === 0) return; // 无记录不提醒
-            const lastExport = localStorage.getItem('checking_list_last_export');
-            if (!lastExport) {
-                // 从未导出过，有记录就提醒
-                document.getElementById('backupReminder').classList.add('show');
-                return;
-            }
-            const daysSince = (Date.now() - new Date(lastExport).getTime()) / (1000 * 60 * 60 * 24);
-            if (daysSince >= 7) {
-                document.getElementById('backupReminder').classList.add('show');
-            }
+            document.getElementById('backupReminder').classList.add('show');
         }
 
         function dismissReminder() {
@@ -1233,6 +1225,7 @@
             // 清空表单
             resetForm();
             loadHistory();
+            checkBackupReminder();
             showToast('提交成功！点击导出备份 →', 'success', exportJSON);
         }
 
