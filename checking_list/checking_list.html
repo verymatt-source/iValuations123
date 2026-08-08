@@ -98,6 +98,7 @@
         .type-target { background: #ede9fe; color: #7c3aed; }
         .type-quality { background: #fef3c7; color: #92400e; }
         .type-position { background: #d1fae5; color: #065f46; }
+        .type-reference { background: #e2e8f0; color: #64748b; }
         .check-desc { font-size: 13px; color: #64748b; margin-bottom: 10px; }
         .check-result {
             display: inline-flex; align-items: center; gap: 6px;
@@ -335,7 +336,7 @@
                     <div class="check-content">
                         <div class="check-label">
                             宽基双锚
-                            <span class="check-type type-master">主开关</span>
+                            <span class="check-type type-reference">参考</span>
                         </div>
                         <div class="check-desc">沪深300 & 中证500，近十年 PE百分位 AND PB百分位 均需 ≤30%</div>
                         <div class="data-display" id="wideAnchorData">
@@ -832,7 +833,7 @@
             renderPercentile('hs300Pb', hs300Pb);
             renderPercentile('zz500Pe', zz500Pe);
             renderPercentile('zz500Pb', zz500Pb);
-            setResult('result1', 'num1', c1Pass, c1Pass ? '通过' : '未通过（需四项均≤30%）');
+            setResult('result1', 'num1', c1Pass, c1Pass ? '达标（参考）' : '未达（参考·不强制）');
             checkStates.c1 = c1Pass;
 
             // ② 整体破净判定
@@ -847,8 +848,8 @@
             // 仓位档位判定
             updatePosition(pjgzbVal);
 
-            // 主开关总体状态
-            const masterPass = c1Pass && c2Pass;
+            // 主开关总体状态（仅 ②整体破净 为强制条件，①宽基双锚 改为参考）
+            const masterPass = c2Pass;
             document.getElementById('masterSwitchStatus').textContent = masterPass ? '✅ 主开关通过' : '❌ 主开关未通过';
 
             // 控制表单锁定
