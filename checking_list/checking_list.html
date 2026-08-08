@@ -742,12 +742,14 @@
                 return;
             }
 
-            // 按 name 排序，方便查找
-            const sorted = [...undervalued].sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+            // 按星级降序（最低估优先），同星级按名称排
+            const sorted = [...undervalued].sort((a, b) =>
+                (b.star || 0) - (a.star || 0) || a.name.localeCompare(b.name, 'zh'));
             sorted.forEach(item => {
+                const star = item.star || 0;
                 const opt = document.createElement('option');
                 opt.value = item.index_code;
-                opt.textContent = `${item.name}（${item.index_code}）`;
+                opt.textContent = `${'★'.repeat(star)}${'☆'.repeat(5 - star)} ${item.name}（${item.index_code}）`;
                 select.appendChild(opt);
             });
         }
