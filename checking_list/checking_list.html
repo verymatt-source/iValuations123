@@ -330,9 +330,32 @@
                 <div class="module-info" id="masterSwitchStatus">判定中...</div>
             </div>
             <div class="module-body">
-                <!-- ① 宽基双锚 -->
+                <!-- ① 整体破净（主开关） -->
                 <div class="check-row">
                     <div class="check-num" id="num1">1</div>
+                    <div class="check-content">
+                        <div class="check-label">
+                            整体破净
+                            <span class="check-type type-master">主开关</span>
+                        </div>
+                        <div class="check-desc">破净股占比 ≥9%（预估年均约21个交易日达成）</div>
+                        <div class="data-display">
+                            <div class="data-item">
+                                <div class="label">当前破净股占比</div>
+                                <div class="value" id="pjgzbValue">--</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="label">破净股数量 / 总数</div>
+                                <div class="value" id="pjgzbDetail" style="font-size:14px;">--</div>
+                            </div>
+                        </div>
+                        <div class="check-result result-wait" id="result1">等待数据</div>
+                    </div>
+                </div>
+
+                <!-- ② 宽基双锚（参考） -->
+                <div class="check-row">
+                    <div class="check-num" id="num2">2</div>
                     <div class="check-content">
                         <div class="check-label">
                             宽基双锚
@@ -355,29 +378,6 @@
                             <div class="data-item">
                                 <div class="label">中证500 PB百分位</div>
                                 <div class="value" id="zz500Pb">--</div>
-                            </div>
-                        </div>
-                        <div class="check-result result-wait" id="result1">等待数据</div>
-                    </div>
-                </div>
-
-                <!-- ② 整体破净 -->
-                <div class="check-row">
-                    <div class="check-num" id="num2">2</div>
-                    <div class="check-content">
-                        <div class="check-label">
-                            整体破净
-                            <span class="check-type type-master">主开关</span>
-                        </div>
-                        <div class="check-desc">破净股占比 ≥9%（预估年均约21个交易日达成）</div>
-                        <div class="data-display">
-                            <div class="data-item">
-                                <div class="label">当前破净股占比</div>
-                                <div class="value" id="pjgzbValue">--</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="label">破净股数量 / 总数</div>
-                                <div class="value" id="pjgzbDetail" style="font-size:14px;">--</div>
                             </div>
                         </div>
                         <div class="check-result result-wait" id="result2">等待数据</div>
@@ -474,7 +474,7 @@
                                 单季盈利(E)
                                 <span class="check-type type-quality">质量闸</span>
                             </div>
-                            <div class="check-desc">近3个单季净利润同比增速 A1→A2→A3，要求相邻两期下滑不超过20%。若A3≥A2近期向好应加分</div>
+                            <div class="check-desc">近3个单季净利润同比增速 A1→A2→A3，要求相邻两期下滑不超过20%。若A3≥A2，表示行业处于积极一面</div>
                             <div class="form-row">
                                 <label>A1(前前季)</label>
                                 <input type="number" id="a1" placeholder="如：-8.2" disabled style="width:120px;" oninput="evaluateCheck4()">
@@ -502,7 +502,7 @@
                                 单季ROE(E)
                                 <span class="check-type type-quality">质量闸(可选)</span>
                             </div>
-                            <div class="check-desc">近3个单季ROE B1→B2→B3，要求相邻两期下滑不超过20%。若B3≥B2近期向好应加分。仅观察，不否决买入</div>
+                            <div class="check-desc">近3个单季ROE B1→B2→B3，要求相邻两期下滑不超过20%。若B3≥B2，表示行业处于积极一面。仅观察，不否决买入</div>
                             <div class="form-row">
                                 <label>B1(前前季)</label>
                                 <input type="number" id="b1" placeholder="如：12.3" disabled style="width:120px;" oninput="evaluateCheck5()">
@@ -830,20 +830,21 @@
             const c1Pass = hs300Pe != null && hs300Pb != null && zz500Pe != null && zz500Pb != null
                 && hs300Pe <= 0.30 && hs300Pb <= 0.30 && zz500Pe <= 0.30 && zz500Pb <= 0.30;
 
-            // 渲染①数据
+            // 渲染宽基双锚（参考项）数据
             renderPercentile('hs300Pe', hs300Pe);
             renderPercentile('hs300Pb', hs300Pb);
             renderPercentile('zz500Pe', zz500Pe);
             renderPercentile('zz500Pb', zz500Pb);
-            setResult('result1', 'num1', c1Pass, c1Pass ? '达标（参考）' : '未达（参考·不强制）');
+            // 宽基双锚现已视觉排为 ②（参考项），用中性样式，避免红色告警误导
+            setResultRef('result2', 'num2', c1Pass, c1Pass ? '达标（参考）' : '未达（参考·不强制）');
             checkStates.c1 = c1Pass;
 
-            // ② 整体破净判定
+            // 整体破净（主开关，现视觉排为 ①）判定
             const c2Pass = pjgzbVal != null && pjgzbVal >= 0.09;
             document.getElementById('pjgzbValue').textContent = pjgzbVal != null ? (pjgzbVal * 100).toFixed(2) + '%' : '--';
             document.getElementById('pjgzbValue').className = 'value ' + (pjgzbVal != null ? (pjgzbVal >= 0.09 ? 'green' : 'red') : '');
             document.getElementById('pjgzbDetail').textContent = pjgzbCount != '--' ? `${pjgzbCount} / ${pjgzbTotal}` : '--';
-            setResult('result2', 'num2', c2Pass, c2Pass ? '通过（≥9%）' : '未通过（当前<9%）');
+            setResult('result1', 'num1', c2Pass, c2Pass ? '通过（≥9%）' : '未通过（当前<9%）');
             checkStates.c2 = c2Pass;
             currentPjgzbVal = pjgzbVal;
 
@@ -893,6 +894,21 @@
             resultEl.className = 'check-result result-wait';
             resultEl.textContent = text;
             numEl.className = 'check-num';
+        }
+
+        // 参考项专用：达标用绿、未达用黄色中性，避免红色告警误导（参考项不否决）
+        function setResultRef(resultId, numId, pass, text) {
+            const resultEl = document.getElementById(resultId);
+            const numEl = document.getElementById(numId);
+            if (pass) {
+                resultEl.className = 'check-result result-pass';
+                resultEl.textContent = '✅ ' + text;
+                numEl.className = 'check-num pass';
+            } else {
+                resultEl.className = 'check-result result-warn';
+                resultEl.textContent = '⚠️ ' + text;
+                numEl.className = 'check-num warn';
+            }
         }
 
         /* ========== 仓位档位 ========== */
@@ -958,7 +974,7 @@
         }
 
         function evaluateCheck3() {
-            if (!checkStates.c1 || !checkStates.c2) return;
+            if (!checkStates.c2) return;
 
             if (!selectedTarget) {
                 setResultWait('result3', 'num3', '请选择目标指数');
@@ -973,8 +989,8 @@
             if (valMode === 'percentile') {
                 const pePct = selectedTarget.pe_percentile;
                 const pbPct = selectedTarget.pb_percentile;
-                // PE=0 或 PB=0 视为无数据
-                if (pePct == null || pePct <= 0 || pbPct == null || pbPct <= 0) {
+                // 仅当百分位为 null 视为无数据；百分位=0 是合法的“历史最低”，不应判缺失
+                if (pePct == null || pbPct == null) {
                     setResultWait('result3', 'num3', '该指数PE/PB百分位数据缺失');
                     checkStates.c3 = false;
                     updateSubmitBtn();
@@ -1025,7 +1041,7 @@
 
         /* ========== ④ 盈利趋势判定 ========== */
         function evaluateCheck4() {
-            if (!checkStates.c1 || !checkStates.c2) return;
+            if (!checkStates.c2) return;
             const a1 = parseFloat(document.getElementById('a1').value);
             const a2 = parseFloat(document.getElementById('a2').value);
             const a3 = parseFloat(document.getElementById('a3').value);
@@ -1046,7 +1062,7 @@
 
         /* ========== ⑤ 单季ROE(E)判定 ========== */
         function evaluateCheck5() {
-            if (!checkStates.c1 || !checkStates.c2) return;
+            if (!checkStates.c2) return;
             const b1 = parseFloat(document.getElementById('b1').value);
             const b2 = parseFloat(document.getElementById('b2').value);
             const b3 = parseFloat(document.getElementById('b3').value);
@@ -1088,14 +1104,14 @@
         function updateSubmitBtn() {
             const btn = document.getElementById('submitBtn');
             const tag = document.getElementById('tradeTag');
-            const canSubmit = checkStates.c1 && checkStates.c2 && checkStates.c3 && checkStates.c4;
+            const canSubmit = checkStates.c2 && checkStates.c3 && checkStates.c4;
             btn.className = 'submit-btn ' + (canSubmit ? 'enabled' : 'disabled');
             tag.textContent = canSubmit ? '可提交' : '③④通过后解锁';
         }
 
         /* ========== 提交记录 ========== */
         function submitRecord() {
-            if (!checkStates.c1 || !checkStates.c2 || !checkStates.c3 || !checkStates.c4) return;
+            if (!checkStates.c2 || !checkStates.c3 || !checkStates.c4) return;
 
             // 校验买入登记必填字段
             const requiredFields = [
