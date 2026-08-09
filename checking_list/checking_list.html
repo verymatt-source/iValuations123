@@ -353,13 +353,13 @@
                     </div>
                 </div>
 
-                <!-- ② 宽基双锚（参考） -->
+                <!-- ② 宽基双锚（主开关） -->
                 <div class="check-row">
                     <div class="check-num" id="num2">2</div>
                     <div class="check-content">
                         <div class="check-label">
                             宽基双锚
-                            <span class="check-type type-reference">参考</span>
+                            <span class="check-type type-master">主开关</span>
                         </div>
                         <div class="check-desc">沪深300 & 中证500，近十年 PE百分位 AND PB百分位 均需 ≤30%</div>
                         <div class="data-display" id="wideAnchorData">
@@ -830,13 +830,13 @@
             const c1Pass = hs300Pe != null && hs300Pb != null && zz500Pe != null && zz500Pb != null
                 && hs300Pe <= 0.30 && hs300Pb <= 0.30 && zz500Pe <= 0.30 && zz500Pb <= 0.30;
 
-            // 渲染宽基双锚（参考项）数据
+            // 渲染宽基双锚数据
             renderPercentile('hs300Pe', hs300Pe);
             renderPercentile('hs300Pb', hs300Pb);
             renderPercentile('zz500Pe', zz500Pe);
             renderPercentile('zz500Pb', zz500Pb);
-            // 宽基双锚现已视觉排为 ②（参考项），用中性样式，避免红色告警误导
-            setResultRef('result2', 'num2', c1Pass, c1Pass ? '达标（参考）' : '未达（参考·不强制）');
+            // 宽基双锚为强制主开关，未达标必须显红告警
+            setResult('result2', 'num2', c1Pass, c1Pass ? '通过（双锚达标）' : '未通过（双锚未达标）');
             checkStates.c1 = c1Pass;
 
             // 整体破净（主开关，现视觉排为 ①）判定
@@ -851,8 +851,8 @@
             // 仓位档位判定
             updatePosition(pjgzbVal);
 
-            // 主开关总体状态（仅 ②整体破净 为强制条件，①宽基双锚 改为参考）
-            const masterPass = c2Pass;
+            // 主开关总体状态：②整体破净 与 ②宽基双锚 均为强制条件，须同时满足
+            const masterPass = c2Pass && c1Pass;
             document.getElementById('masterSwitchStatus').textContent = masterPass ? '✅ 主开关通过' : '❌ 主开关未通过';
 
             // 控制表单锁定
@@ -894,21 +894,6 @@
             resultEl.className = 'check-result result-wait';
             resultEl.textContent = text;
             numEl.className = 'check-num';
-        }
-
-        // 参考项专用：达标用绿、未达用黄色中性，避免红色告警误导（参考项不否决）
-        function setResultRef(resultId, numId, pass, text) {
-            const resultEl = document.getElementById(resultId);
-            const numEl = document.getElementById(numId);
-            if (pass) {
-                resultEl.className = 'check-result result-pass';
-                resultEl.textContent = '✅ ' + text;
-                numEl.className = 'check-num pass';
-            } else {
-                resultEl.className = 'check-result result-warn';
-                resultEl.textContent = '⚠️ ' + text;
-                numEl.className = 'check-num warn';
-            }
         }
 
         /* ========== 仓位档位 ========== */
@@ -974,7 +959,7 @@
         }
 
         function evaluateCheck3() {
-            if (!checkStates.c2) return;
+            if (!checkStates.c2 || !checkStates.c1) return;
 
             if (!selectedTarget) {
                 setResultWait('result3', 'num3', '请选择目标指数');
@@ -1041,7 +1026,7 @@
 
         /* ========== ④ 盈利趋势判定 ========== */
         function evaluateCheck4() {
-            if (!checkStates.c2) return;
+            if (!checkStates.c2 || !checkStates.c1) return;
             const a1 = parseFloat(document.getElementById('a1').value);
             const a2 = parseFloat(document.getElementById('a2').value);
             const a3 = parseFloat(document.getElementById('a3').value);
@@ -1062,7 +1047,7 @@
 
         /* ========== ⑤ 单季ROE(E)判定 ========== */
         function evaluateCheck5() {
-            if (!checkStates.c2) return;
+            if (!checkStates.c2 || !checkStates.c1) return;
             const b1 = parseFloat(document.getElementById('b1').value);
             const b2 = parseFloat(document.getElementById('b2').value);
             const b3 = parseFloat(document.getElementById('b3').value);
@@ -1104,14 +1089,14 @@
         function updateSubmitBtn() {
             const btn = document.getElementById('submitBtn');
             const tag = document.getElementById('tradeTag');
-            const canSubmit = checkStates.c2 && checkStates.c3 && checkStates.c4;
+            const canSubmit = checkStates.c2 && checkStates.c1 && checkStates.c3 && checkStates.c4;
             btn.className = 'submit-btn ' + (canSubmit ? 'enabled' : 'disabled');
             tag.textContent = canSubmit ? '可提交' : '③④通过后解锁';
         }
 
         /* ========== 提交记录 ========== */
         function submitRecord() {
-            if (!checkStates.c2 || !checkStates.c3 || !checkStates.c4) return;
+            if (!checkStates.c2 || !checkStates.c1 || !checkStates.c3 || !checkStates.c4) return;
 
             // 校验买入登记必填字段
             const requiredFields = [
