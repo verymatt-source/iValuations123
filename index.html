@@ -331,7 +331,7 @@
             table { min-width: 900px; }
         }
     </style>
-    <script src="sub_tools/data/history_snapshot.js?v=20260810"></script>
+    <script src="sub_tools/data/history_snapshot.js?v=20260714"></script>
 </head>
 <body>
     <div class="container">
@@ -512,14 +512,14 @@
         </div>
     </div>
 
-    <script src="index_data_with_stars.js?v=20260810"></script>
-    <script src="sub_tools/data/pjgzb_data.js?v=20260810"></script>
-    <script src="sub_tools/data/kzzjj_data.js?v=20260810"></script>
-    <script src="sub_tools/data/usdcny_data.js?v=20260810"></script>
-    <script src="sub_tools/data/legulegu_data.js?v=20260810"></script>
-    <script src="sub_tools/data/shiller_data.js?v=20260810"></script>
-    <script src="sub_tools/data/vix_data.js?v=20260810"></script>
-    <script src="sub_tools/data/erp_data.js?v=20260810"></script>
+    <script src="index_data_with_stars.js?v=20260714"></script>
+    <script src="sub_tools/data/pjgzb_data.js?v=20260714"></script>
+    <script src="sub_tools/data/kzzjj_data.js?v=20260714"></script>
+    <script src="sub_tools/data/usdcny_data.js?v=20260714"></script>
+    <script src="sub_tools/data/legulegu_data.js?v=20260714"></script>
+    <script src="sub_tools/data/shiller_data.js?v=20260714"></script>
+    <script src="sub_tools/data/vix_data.js?v=20260714"></script>
+    <script src="sub_tools/data/erp_data.js?v=20260714"></script>
     <script>
         const data = window.indexEvaData.data.items;
         const meta = window.reportMeta || {};
@@ -537,7 +537,7 @@
                 window.pjgzbData['目标值'] = 0.1;
                 window.pjgzbData['比例'] = (0.095 - 0.1) / 0.1;
             }
-            // 覆盖沪深300/中证500 PE/PB百分位 => 均<=30%
+            // 覆盖沪深300/中证500 PE百分位 => 均<=35%（满足横幅条件2）
             data.forEach(item => {
                 if (item.index_code === 'SH000300' || item.index_code === 'SH000905') {
                     item.pe_percentile = 0.20;
@@ -545,7 +545,7 @@
                     item.eva_type = 'low';
                 }
             });
-            console.log('[TestMode] 模拟数据已注入：破净股9.5%，沪深300/中证500百分位20%/25%');
+            console.log('[TestMode] 模拟数据已注入：破净股9.5%，沪深300/中证500 PE百分位20%(≤35%)');
         })();
         
         // 显示时间和数据更新时间
@@ -924,12 +924,19 @@
 
             // ========== 买入信号横幅 ==========
             // 条件1：破净股占比 >= 9%
+            // 条件2：沪深300/中证500 PE百分位 <= 35%
             const pjgzbVal = window.pjgzbData && window.pjgzbData['当前值'] !== undefined
                 ? window.pjgzbData['当前值'] : null;
             const cond1 = pjgzbVal !== null && pjgzbVal >= 0.09;
 
+            const hs300Item = data.find(i => i.index_code === 'SH000300');
+            const zz500Item = data.find(i => i.index_code === 'SH000905');
+            const hs300Pe = hs300Item ? hs300Item.pe_percentile : null;
+            const zz500Pe = zz500Item ? zz500Item.pe_percentile : null;
+            const cond2 = hs300Pe != null && zz500Pe != null && hs300Pe <= 0.35 && zz500Pe <= 0.35;
+
             const banner = document.getElementById('buySignalBanner');
-            if (cond1) {
+            if (cond1 && cond2) {
                 banner.style.display = 'block';
                 banner.innerHTML = '🟢 遵循买入检查清单，规避估值陷阱 <span class="arrow">&gt;&gt;</span>';
                 banner.onclick = () => window.location.href = 'checking_list/checking_list.html';
