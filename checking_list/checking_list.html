@@ -353,31 +353,23 @@
                     </div>
                 </div>
 
-                <!-- ② 宽基双锚（主开关） -->
+                <!-- ② 宽基PE锚（主开关） -->
                 <div class="check-row">
                     <div class="check-num" id="num2">2</div>
                     <div class="check-content">
                         <div class="check-label">
-                            宽基双锚
+                            宽基PE锚
                             <span class="check-type type-master">主开关</span>
                         </div>
-                        <div class="check-desc">沪深300 & 中证500，近十年 PE百分位 AND PB百分位 均需 ≤30%</div>
+                        <div class="check-desc">沪深300 & 中证500，近十年 PE百分位 均需 ≤35%</div>
                         <div class="data-display" id="wideAnchorData">
                             <div class="data-item">
                                 <div class="label">沪深300 PE百分位</div>
                                 <div class="value" id="hs300Pe">--</div>
                             </div>
                             <div class="data-item">
-                                <div class="label">沪深300 PB百分位</div>
-                                <div class="value" id="hs300Pb">--</div>
-                            </div>
-                            <div class="data-item">
                                 <div class="label">中证500 PE百分位</div>
                                 <div class="value" id="zz500Pe">--</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="label">中证500 PB百分位</div>
-                                <div class="value" id="zz500Pb">--</div>
                             </div>
                         </div>
                         <div class="check-result result-wait" id="result2">等待数据</div>
@@ -561,8 +553,8 @@
                     <!-- 金额规则备注 -->
                     <div style="background:#f0f4f8;border-left:3px solid #2c5282;border-radius:6px;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#475569;line-height:1.8;">
                         <strong>📋 金额规则：</strong>
-                        破净股占比 9%~10% → 单笔买入上限 <strong style="color:#d97706;">5万元</strong>；
-                        破净股占比 ≥10% → 单笔买入上限 <strong style="color:#059669;">50万元</strong>
+                        破净股占比 9%~10% → 单笔买入上限 <strong style="color:#d97706;">20万元（或1/5）</strong>；
+                        破净股占比 ≥10% → 单笔买入上限 <strong style="color:#059669;">50万元（或1/5）</strong>
                     </div>
                     <div class="form-row">
                         <label>买入对象</label>
@@ -802,12 +794,12 @@
         /* ========== 主开关判定 ========== */
         function evaluateMasterSwitches() {
             // 获取数据
-            let hs300Pe, hs300Pb, zz500Pe, zz500Pb, pjgzbVal, pjgzbCount, pjgzbTotal;
+            let hs300Pe, zz500Pe, pjgzbVal, pjgzbCount, pjgzbTotal;
 
             if (isTestMode) {
                 // 测试模式：注入模拟数据
-                hs300Pe = 0.15; hs300Pb = 0.12;
-                zz500Pe = 0.08; zz500Pb = 0.05;
+                hs300Pe = 0.15;
+                zz500Pe = 0.08;
                 pjgzbVal = 0.095;
                 pjgzbCount = 525; pjgzbTotal = 5525;
             } else {
@@ -816,9 +808,7 @@
                 const hs300 = items.find(i => i.index_code === 'SH000300');
                 const zz500 = items.find(i => i.index_code === 'SH000905');
                 hs300Pe = hs300 ? hs300.pe_percentile : null;
-                hs300Pb = hs300 ? hs300.pb_percentile : null;
                 zz500Pe = zz500 ? zz500.pe_percentile : null;
-                zz500Pb = zz500 ? zz500.pb_percentile : null;
 
                 const pjData = window.pjgzbData || {};
                 pjgzbVal = pjData['当前值'] || null;
@@ -826,17 +816,15 @@
                 pjgzbTotal = pjData._extra ? pjData._extra['总股票数量'] : '--';
             }
 
-            // ① 宽基双锚判定
-            const c1Pass = hs300Pe != null && hs300Pb != null && zz500Pe != null && zz500Pb != null
-                && hs300Pe <= 0.30 && hs300Pb <= 0.30 && zz500Pe <= 0.30 && zz500Pb <= 0.30;
+            // ② 宽基PE锚判定（仅 PE百分位，阈值 35%）
+            const c1Pass = hs300Pe != null && zz500Pe != null
+                && hs300Pe <= 0.35 && zz500Pe <= 0.35;
 
-            // 渲染宽基双锚数据
+            // 渲染宽基PE锚数据
             renderPercentile('hs300Pe', hs300Pe);
-            renderPercentile('hs300Pb', hs300Pb);
             renderPercentile('zz500Pe', zz500Pe);
-            renderPercentile('zz500Pb', zz500Pb);
-            // 宽基双锚为强制主开关，未达标必须显红告警
-            setResult('result2', 'num2', c1Pass, c1Pass ? '通过（双锚达标）' : '未通过（双锚未达标）');
+            // 宽基PE锚为强制主开关，未达标必须显红告警
+            setResult('result2', 'num2', c1Pass, c1Pass ? '通过（PE锚达标）' : '未通过（PE锚未达标）');
             checkStates.c1 = c1Pass;
 
             // 整体破净（主开关，现视觉排为 ①）判定
@@ -851,7 +839,7 @@
             // 仓位档位判定
             updatePosition(pjgzbVal);
 
-            // 主开关总体状态：②整体破净 与 ②宽基双锚 均为强制条件，须同时满足
+            // 主开关总体状态：①整体破净 与 ②宽基PE锚 均为强制条件，须同时满足
             const masterPass = c2Pass && c1Pass;
             document.getElementById('masterSwitchStatus').textContent = masterPass ? '✅ 主开关通过' : '❌ 主开关未通过';
 
@@ -863,7 +851,7 @@
             const el = document.getElementById(id);
             if (val == null) { el.textContent = '--'; el.className = 'value'; return; }
             el.textContent = (val * 100).toFixed(1) + '%';
-            el.className = 'value ' + (val <= 0.30 ? 'green' : val <= 0.70 ? 'yellow' : 'red');
+            el.className = 'value ' + (val <= 0.35 ? 'green' : val <= 0.70 ? 'yellow' : 'red');
         }
 
         function setResult(resultId, numId, pass, text) {
@@ -903,11 +891,11 @@
             if (pjgzbVal == null || pjgzbVal < 0.09) {
                 currentPosition = { level: '未达标', hint: '破净股占比≥9%方可建仓' };
             } else if (pjgzbVal < 0.10) {
-                currentPosition = { level: '试探性建仓', hint: '1/4仓 or 5万' };
+                currentPosition = { level: '试探性建仓', hint: '1/5仓 or 20万' };
             } else if (pjgzbVal < 0.12) {
-                currentPosition = { level: '开始重仓', hint: '1/4仓 or 50万' };
+                currentPosition = { level: '开始重仓', hint: '1/5仓 or 50万' };
             } else {
-                currentPosition = { level: '重仓升级', hint: '1/4仓 or 50万' };
+                currentPosition = { level: '重仓升级', hint: '1/5仓 or 50万' };
             }
             levelEl.textContent = currentPosition.level;
             hintEl.textContent = currentPosition.hint;
@@ -1135,10 +1123,10 @@
                 let amountRule = '';
                 if (currentPjgzbVal >= 0.10) {
                     maxAmount = 500000;
-                    amountRule = `破净股占比${(currentPjgzbVal * 100).toFixed(2)}%≥10%，单笔买入上限50万元`;
+                    amountRule = `破净股占比${(currentPjgzbVal * 100).toFixed(2)}%≥10%，单笔买入上限50万元（或1/5）`;
                 } else if (currentPjgzbVal >= 0.09) {
-                    maxAmount = 50000;
-                    amountRule = `破净股占比${(currentPjgzbVal * 100).toFixed(2)}%（9%~10%），单笔买入上限5万元`;
+                    maxAmount = 200000;
+                    amountRule = `破净股占比${(currentPjgzbVal * 100).toFixed(2)}%（9%~10%），单笔买入上限20万元（或1/5）`;
                 }
                 if (maxAmount > 0 && buyAmountVal > maxAmount) {
                     showToast(`金额超限：${amountRule}，当前${buyAmountVal.toLocaleString()}元`, 'error', null, 5000);
