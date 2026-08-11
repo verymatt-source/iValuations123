@@ -361,17 +361,18 @@
                             宽基PE锚
                             <span class="check-type type-master">主开关</span>
                         </div>
-                        <div class="check-desc">沪深300 & 中证500，近十年 PE百分位 均需 ≤35%</div>
+                        <div class="check-desc">沪深300 当前 PE ≤12，且中证500 当前 PE ≤27</div>
                         <div class="data-display" id="wideAnchorData">
                             <div class="data-item">
-                                <div class="label">沪深300 PE百分位</div>
+                                <div class="label">沪深300 当前PE</div>
                                 <div class="value" id="hs300Pe">--</div>
                             </div>
                             <div class="data-item">
-                                <div class="label">中证500 PE百分位</div>
+                                <div class="label">中证500 当前PE</div>
                                 <div class="value" id="zz500Pe">--</div>
                             </div>
                         </div>
+                        <div class="check-desc">阈值来源：理杏仁网站人工查询的近20年历史 PE 35%分位。实时 PE 来源：蛋卷基金 API，滚动 PE/TTM。当前阈值：沪深300 PE ≤12，中证500 PE ≤27。本条件使用绝对 PE，不使用蛋卷近十年 PE 百分位。</div>
                         <div class="check-result result-wait" id="result2">等待数据</div>
                     </div>
                 </div>
@@ -687,6 +688,8 @@
 
         /* ========== 全局状态 ========== */
         const isTestMode = new URLSearchParams(window.location.search).get('test') === '1';
+        const HS300_PE_THRESHOLD = 12;
+        const ZZ500_PE_THRESHOLD = 27;
         let valMode = 'percentile'; // 'percentile' | 'absolute'
         let checkStates = { c1: false, c2: false, c3: false, c4: false, c5: null };
         // c5: null=未填, true=通过, false=未通过（不否决）
@@ -798,8 +801,8 @@
 
             if (isTestMode) {
                 // 测试模式：注入模拟数据
-                hs300Pe = 0.15;
-                zz500Pe = 0.08;
+                hs300Pe = HS300_PE_THRESHOLD;
+                zz500Pe = ZZ500_PE_THRESHOLD;
                 pjgzbVal = 0.095;
                 pjgzbCount = 525; pjgzbTotal = 5525;
             } else {
@@ -807,8 +810,8 @@
                 const items = (window.indexEvaData && window.indexEvaData.data && window.indexEvaData.data.items) || [];
                 const hs300 = items.find(i => i.index_code === 'SH000300');
                 const zz500 = items.find(i => i.index_code === 'SH000905');
-                hs300Pe = hs300 ? hs300.pe_percentile : null;
-                zz500Pe = zz500 ? zz500.pe_percentile : null;
+                hs300Pe = hs300 && Number.isFinite(hs300.pe) && hs300.pe > 0 ? hs300.pe : null;
+                zz500Pe = zz500 && Number.isFinite(zz500.pe) && zz500.pe > 0 ? zz500.pe : null;
 
                 const pjData = window.pjgzbData || {};
                 pjgzbVal = pjData['当前值'] || null;
@@ -816,15 +819,15 @@
                 pjgzbTotal = pjData._extra ? pjData._extra['总股票数量'] : '--';
             }
 
-            // ② 宽基PE锚判定（仅 PE百分位，阈值 35%）
+            // ② 宽基PE锚判定（绝对PE，阈值由近20年历史 PE 35%分位确定）
             const c1Pass = hs300Pe != null && zz500Pe != null
-                && hs300Pe <= 0.35 && zz500Pe <= 0.35;
+                && hs300Pe <= HS300_PE_THRESHOLD && zz500Pe <= ZZ500_PE_THRESHOLD;
 
             // 渲染宽基PE锚数据
-            renderPercentile('hs300Pe', hs300Pe);
-            renderPercentile('zz500Pe', zz500Pe);
+            renderPe('hs300Pe', hs300Pe, HS300_PE_THRESHOLD);
+            renderPe('zz500Pe', zz500Pe, ZZ500_PE_THRESHOLD);
             // 宽基PE锚为强制主开关，未达标必须显红告警
-            setResult('result2', 'num2', c1Pass, c1Pass ? '通过（PE锚达标）' : '未通过（PE锚未达标）');
+            setResult('result2', 'num2', c1Pass, c1Pass ? '通过（绝对PE锚达标）' : '未通过（绝对PE锚未达标）');
             checkStates.c1 = c1Pass;
 
             // 整体破净（主开关，现视觉排为 ①）判定
@@ -847,11 +850,11 @@
             toggleLock(masterPass);
         }
 
-        function renderPercentile(id, val) {
+        function renderPe(id, val, threshold) {
             const el = document.getElementById(id);
             if (val == null) { el.textContent = '--'; el.className = 'value'; return; }
-            el.textContent = (val * 100).toFixed(1) + '%';
-            el.className = 'value ' + (val <= 0.35 ? 'green' : val <= 0.70 ? 'yellow' : 'red');
+            el.textContent = val.toFixed(2);
+            el.className = 'value ' + (val <= threshold ? 'green' : 'red');
         }
 
         function setResult(resultId, numId, pass, text) {
