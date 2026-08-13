@@ -459,65 +459,42 @@
                         </div>
                     </div>
 
-                    <!-- ④ 单季盈利(E) -->
+                    <!-- ④ ROE观察 -->
                     <div class="check-row">
                         <div class="check-num" id="num4">4</div>
                         <div class="check-content">
                             <div class="check-label">
-                                单季盈利(E)
+                                ROE观察
                                 <span class="check-type type-quality">质量闸</span>
                             </div>
-                            <div class="check-desc">近3个单季净利润同比增速 A1→A2→A3，要求相邻两期下滑不超过20%。若A3≥A2，表示行业处于积极一面</div>
+                            <div class="check-desc">比较最近两个披露期与上年同期的累计ROE，判断盈利能力是在修复、稳定还是转弱。不代表盈利已企稳。</div>
                             <div class="form-row">
-                                <label>A1(前前季)</label>
-                                <input type="number" id="a1" placeholder="如：-8.2" disabled style="width:120px;" oninput="evaluateCheck4()">
+                                <label>ROE_A1(最新)</label>
+                                <input type="number" id="roeA1" placeholder="如：12.3" disabled style="width:120px;" oninput="evaluateRoeObservation()">
                                 <span class="unit">%</span>
                             </div>
                             <div class="form-row">
-                                <label>A2(前季)</label>
-                                <input type="number" id="a2" placeholder="如：-5.1" disabled style="width:120px;" oninput="evaluateCheck4()">
+                                <label>ROE_A2(上年同期)</label>
+                                <input type="number" id="roeA2" placeholder="如：12.8" disabled style="width:120px;" oninput="evaluateRoeObservation()">
                                 <span class="unit">%</span>
                             </div>
                             <div class="form-row">
-                                <label>A3(当季)</label>
-                                <input type="number" id="a3" placeholder="如：2.3" disabled style="width:120px;" oninput="evaluateCheck4()">
+                                <label>ROE_B1(上一季)</label>
+                                <input type="number" id="roeB1" placeholder="如：11.8" disabled style="width:120px;" oninput="evaluateRoeObservation()">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="form-row">
+                                <label>ROE_B2(上年同期)</label>
+                                <input type="number" id="roeB2" placeholder="如：12.4" disabled style="width:120px;" oninput="evaluateRoeObservation()">
                                 <span class="unit">%</span>
                             </div>
                             <div class="check-result result-wait" id="result4">等待填写</div>
                         </div>
                     </div>
 
-                    <!-- ⑤ 单季ROE(E)（可选） -->
+                    <!-- ⑤ 仓位管理 -->
                     <div class="check-row">
                         <div class="check-num" id="num5">5</div>
-                        <div class="check-content">
-                            <div class="check-label">
-                                单季ROE(E)
-                                <span class="check-type type-quality">质量闸(可选)</span>
-                            </div>
-                            <div class="check-desc">近3个单季ROE B1→B2→B3，要求相邻两期下滑不超过20%。若B3≥B2，表示行业处于积极一面。仅观察，不否决买入</div>
-                            <div class="form-row">
-                                <label>B1(前前季)</label>
-                                <input type="number" id="b1" placeholder="如：12.3" disabled style="width:120px;" oninput="evaluateCheck5()">
-                                <span class="unit">%</span>
-                            </div>
-                            <div class="form-row">
-                                <label>B2(前季)</label>
-                                <input type="number" id="b2" placeholder="如：11.8" disabled style="width:120px;" oninput="evaluateCheck5()">
-                                <span class="unit">%</span>
-                            </div>
-                            <div class="form-row">
-                                <label>B3(当季)</label>
-                                <input type="number" id="b3" placeholder="如：13.1" disabled style="width:120px;" oninput="evaluateCheck5()">
-                                <span class="unit">%</span>
-                            </div>
-                            <div class="check-result result-wait" id="result5">等待填写</div>
-                        </div>
-                    </div>
-
-                    <!-- ⑥ 仓位管理 -->
-                    <div class="check-row">
-                        <div class="check-num" id="num6">6</div>
                         <div class="check-content">
                             <div class="check-label">
                                 仓位管理
@@ -547,7 +524,7 @@
                     <div class="module-title">
                         <span class="icon">💰</span>
                         <span class="text">买入登记</span>
-                        <span class="tag" id="tradeTag">③④通过后解锁</span>
+                        <span class="tag" id="tradeTag">③通过后解锁</span>
                     </div>
                 </div>
                 <div class="module-body">
@@ -691,8 +668,10 @@
         const HS300_PE_THRESHOLD = 12;
         const ZZ500_PE_THRESHOLD = 27;
         let valMode = 'percentile'; // 'percentile' | 'absolute'
-        let checkStates = { c1: false, c2: false, c3: false, c4: false, c5: null };
-        // c5: null=未填, true=通过, false=未通过（不否决）
+        // 预留为质量闸：设为 true 后，ROE观察即加入提交解锁条件。
+        const ROE_OBSERVATION_REQUIRED = false;
+        let checkStates = { c1: false, c2: false, c3: false, roeObservation: null, roeObservationStatus: null };
+        // roeObservation: null=未填, true=基本稳定/正在修复, false=正在转弱/明显恶化
         let currentPosition = { level: '未达标', hint: '破净股占比≥9%方可建仓' };
         let currentPjgzbVal = null; // 当前破净股占比（全局，供金额校验用）
         let allIndexItems = []; // 所有指数数据缓存
@@ -914,7 +893,7 @@
 
             // 启用/禁用检查项输入
             const fields = ['peThreshold', 'pbThreshold',
-                            'a1', 'a2', 'a3', 'b1', 'b2', 'b3',
+                            'roeA1', 'roeA2', 'roeB1', 'roeB2',
                             'buyTarget', 'buyCode', 'buyAmount', 'buyQuantity', 'buyNote'];
             fields.forEach(id => {
                 const el = document.getElementById(id);
@@ -927,15 +906,13 @@
                 // 重置检查项状态
                 setResultWait('result3', 'num3', '等待主开关通过');
                 setResultWait('result4', 'num4', '等待主开关通过');
-                setResultWait('result5', 'num5', '等待主开关通过');
                 checkStates.c3 = false;
-                checkStates.c4 = false;
-                checkStates.c5 = null;
+                checkStates.roeObservation = null;
+                checkStates.roeObservationStatus = null;
                 updateSubmitBtn();
             } else {
                 setResultWait('result3', 'num3', '等待选择');
                 setResultWait('result4', 'num4', '等待填写');
-                setResultWait('result5', 'num5', '等待填写');
             }
         }
 
@@ -1015,44 +992,52 @@
             updateSubmitBtn();
         }
 
-        /* ========== ④ 盈利趋势判定 ========== */
-        function evaluateCheck4() {
+        /* ========== ④ ROE观察 ========== */
+        function evaluateRoeObservation() {
             if (!checkStates.c2 || !checkStates.c1) return;
-            const a1 = parseFloat(document.getElementById('a1').value);
-            const a2 = parseFloat(document.getElementById('a2').value);
-            const a3 = parseFloat(document.getElementById('a3').value);
-            if (isNaN(a1) || isNaN(a2) || isNaN(a3)) {
+            const roeA1 = parseFloat(document.getElementById('roeA1').value);
+            const roeA2 = parseFloat(document.getElementById('roeA2').value);
+            const roeB1 = parseFloat(document.getElementById('roeB1').value);
+            const roeB2 = parseFloat(document.getElementById('roeB2').value);
+            if ([roeA1, roeA2, roeB1, roeB2].some(isNaN)) {
                 setResultWait('result4', 'num4', '等待填写');
-                checkStates.c4 = false;
+                checkStates.roeObservation = null;
                 updateSubmitBtn();
                 return;
             }
-            const pass = (a1 - a2) <= 20 && (a2 - a3) <= 20;
-            const detail = pass
-                ? `通过（${a1}%→${a2}%→${a3}%，无断崖下跌）`
-                : `未通过（${a1}%→${a2}%→${a3}%，相邻期下滑超20%）`;
-            setResult('result4', 'num4', pass, detail);
-            checkStates.c4 = pass;
-            updateSubmitBtn();
-        }
-
-        /* ========== ⑤ 单季ROE(E)判定 ========== */
-        function evaluateCheck5() {
-            if (!checkStates.c2 || !checkStates.c1) return;
-            const b1 = parseFloat(document.getElementById('b1').value);
-            const b2 = parseFloat(document.getElementById('b2').value);
-            const b3 = parseFloat(document.getElementById('b3').value);
-            if (isNaN(b1) || isNaN(b2) || isNaN(b3)) {
-                setResultWait('result5', 'num5', '等待填写（可选）');
-                checkStates.c5 = null;
-                return;
+            const latestChange = roeA1 - roeA2;
+            const previousChange = roeB1 - roeB2;
+            const trendChange = latestChange - previousChange;
+            let status;
+            let detail;
+            // 规则：同比降幅 <= 1 个百分点视为稳定；降幅收窄 >= 2 个百分点视为修复；
+            // 其余情况按边际转弱或明显恶化提示。ROE_OBSERVATION_REQUIRED 控制是否解锁。
+            if (latestChange < -1) {
+                if (trendChange >= 2) {
+                    status = 'repair';
+                    detail = `ROE正在修复：最新期同比${latestChange.toFixed(1)}个百分点，较上一期改善${trendChange.toFixed(1)}个百分点。`;
+                } else {
+                    status = 'worsening';
+                    detail = trendChange < 0
+                        ? `ROE明显恶化：最新期同比${latestChange.toFixed(1)}个百分点，较上一期进一步下降${Math.abs(trendChange).toFixed(1)}个百分点。`
+                        : `ROE明显恶化：最新期同比${latestChange.toFixed(1)}个百分点，虽较上一期改善${trendChange.toFixed(1)}个百分点，但降幅仍超过1个百分点。`;
+                }
+            } else if (trendChange <= -0.5) {
+                status = 'weakening';
+                detail = `ROE正在转弱：最新期同比${latestChange.toFixed(1)}个百分点，较上一期下降${Math.abs(trendChange).toFixed(1)}个百分点。`;
+            } else {
+                status = 'stable';
+                detail = `ROE基本稳定：最新期同比${latestChange.toFixed(1)}个百分点，较上一期${trendChange < 0 ? '小幅走弱' : '改善'}${Math.abs(trendChange).toFixed(1)}个百分点。`;
             }
-            const pass = (b1 - b2) <= 20 && (b2 - b3) <= 20;
-            const detail = pass
-                ? `通过（${b1}%→${b2}%→${b3}%，无断崖下跌）`
-                : `ROE下滑超20%（${b1}%→${b2}%→${b3}%）`;
-            setResultWarn('result5', 'num5', pass, detail);
-            checkStates.c5 = pass;
+            const pass = status === 'stable' || status === 'repair';
+            if (ROE_OBSERVATION_REQUIRED) {
+                setResult('result4', 'num4', pass, detail);
+            } else {
+                setResultWarn('result4', 'num4', pass, detail);
+            }
+            checkStates.roeObservation = pass;
+            checkStates.roeObservationStatus = status;
+            updateSubmitBtn();
         }
 
         /* ========== 成本单价计算 ========== */
@@ -1065,6 +1050,11 @@
             } else {
                 el.textContent = '--';
             }
+        }
+
+        function getOptionalNumber(id) {
+            const value = parseFloat(document.getElementById(id).value);
+            return Number.isFinite(value) ? value : null;
         }
 
         /* ========== 实时清除 missing 标记 ========== */
@@ -1080,14 +1070,16 @@
         function updateSubmitBtn() {
             const btn = document.getElementById('submitBtn');
             const tag = document.getElementById('tradeTag');
-            const canSubmit = checkStates.c2 && checkStates.c1 && checkStates.c3 && checkStates.c4;
+            const canSubmit = checkStates.c2 && checkStates.c1 && checkStates.c3 &&
+                (!ROE_OBSERVATION_REQUIRED || ['stable', 'repair'].includes(checkStates.roeObservationStatus));
             btn.className = 'submit-btn ' + (canSubmit ? 'enabled' : 'disabled');
-            tag.textContent = canSubmit ? '可提交' : '③④通过后解锁';
+            tag.textContent = canSubmit ? '可提交' : (ROE_OBSERVATION_REQUIRED ? '③④通过后解锁' : '③通过后解锁');
         }
 
         /* ========== 提交记录 ========== */
         function submitRecord() {
-            if (!checkStates.c2 || !checkStates.c1 || !checkStates.c3 || !checkStates.c4) return;
+            if (!checkStates.c2 || !checkStates.c1 || !checkStates.c3 ||
+                (ROE_OBSERVATION_REQUIRED && checkStates.roeObservation !== true)) return;
 
             // 校验买入登记必填字段
             const requiredFields = [
@@ -1186,17 +1178,20 @@
                         valuation: valuation,
                         passed: checkStates.c3
                     },
-                    profitTrend: {
-                        a1: parseFloat(document.getElementById('a1').value) || 0,
-                        a2: parseFloat(document.getElementById('a2').value) || 0,
-                        a3: parseFloat(document.getElementById('a3').value) || 0,
-                        passed: checkStates.c4
-                    },
-                    roeGate: {
-                        b1: parseFloat(document.getElementById('b1').value) || null,
-                        b2: parseFloat(document.getElementById('b2').value) || null,
-                        b3: parseFloat(document.getElementById('b3').value) || null,
-                        passed: checkStates.c5
+                    roeObservation: {
+                        roeA1: getOptionalNumber('roeA1'),
+                        roeA2: getOptionalNumber('roeA2'),
+                        roeB1: getOptionalNumber('roeB1'),
+                        roeB2: getOptionalNumber('roeB2'),
+                        latestChange: Number.isFinite(getOptionalNumber('roeA1') - getOptionalNumber('roeA2'))
+                            ? getOptionalNumber('roeA1') - getOptionalNumber('roeA2') : null,
+                        previousChange: Number.isFinite(getOptionalNumber('roeB1') - getOptionalNumber('roeB2'))
+                            ? getOptionalNumber('roeB1') - getOptionalNumber('roeB2') : null,
+                        status: checkStates.roeObservationStatus || null,
+                        trendChange: Number.isFinite(getOptionalNumber('roeA1') - getOptionalNumber('roeA2') - getOptionalNumber('roeB1') + getOptionalNumber('roeB2'))
+                            ? getOptionalNumber('roeA1') - getOptionalNumber('roeA2') - getOptionalNumber('roeB1') + getOptionalNumber('roeB2') : null,
+                        passed: checkStates.roeObservation,
+                        required: ROE_OBSERVATION_REQUIRED
                     },
                     position: { level: currentPosition.level, hint: currentPosition.hint }
                 },
@@ -1237,7 +1232,7 @@
             });
 
             ['peThreshold', 'pbThreshold',
-             'a1', 'a2', 'a3', 'b1', 'b2', 'b3',
+             'roeA1', 'roeA2', 'roeB1', 'roeB2',
              'buyTarget', 'buyCode', 'buyAmount', 'buyQuantity', 'buyNote'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) { el.value = ''; el.classList.remove('missing'); }
@@ -1245,10 +1240,9 @@
             document.getElementById('unitCost').textContent = '--';
             setResultWait('result3', 'num3', '等待选择');
             setResultWait('result4', 'num4', '等待填写');
-            setResultWait('result5', 'num5', '等待填写（可选）');
             checkStates.c3 = false;
-            checkStates.c4 = false;
-            checkStates.c5 = null;
+            checkStates.roeObservation = null;
+            checkStates.roeObservationStatus = null;
             updateSubmitBtn();
         }
 
