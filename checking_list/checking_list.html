@@ -421,13 +421,13 @@
                                     <label>PE百分位</label>
                                     <span class="computed" id="pePercentileDisplay" style="font-size:14px;min-width:60px;">--</span>
                                     <span class="unit">%</span>
-                                    <span class="hint">≤30% 放行</span>
+                                    <span class="hint">≤35% 放行</span>
                                 </div>
                                 <div class="form-row">
                                     <label>PB百分位</label>
                                     <span class="computed" id="pbPercentileDisplay" style="font-size:14px;min-width:60px;">--</span>
                                     <span class="unit">%</span>
-                                    <span class="hint">≤30% 放行</span>
+                                    <span class="hint">≤35% 放行</span>
                                 </div>
                             </div>
                             <!-- 绝对值模式 -->
@@ -755,9 +755,9 @@
                 const pbVal = selectedTarget.pb;
 
                 pePDisplay.textContent = pePct != null && pePct >= 0 ? (pePct * 100).toFixed(1) : '--';
-                pePDisplay.style.color = pePct != null && pePct >= 0 ? (pePct <= 0.30 ? '#059669' : pePct <= 0.70 ? '#d97706' : '#dc2626') : '#94a3b8';
+                pePDisplay.style.color = pePct != null && pePct >= 0 ? (pePct <= 0.35 ? '#059669' : pePct <= 0.70 ? '#d97706' : '#dc2626') : '#94a3b8';
                 pbPDisplay.textContent = pbPct != null && pbPct >= 0 ? (pbPct * 100).toFixed(1) : '--';
-                pbPDisplay.style.color = pbPct != null && pbPct >= 0 ? (pbPct <= 0.30 ? '#059669' : pbPct <= 0.70 ? '#d97706' : '#dc2626') : '#94a3b8';
+                pbPDisplay.style.color = pbPct != null && pbPct >= 0 ? (pbPct <= 0.35 ? '#059669' : pbPct <= 0.70 ? '#d97706' : '#dc2626') : '#94a3b8';
 
                 peADisplay.textContent = peVal != null && peVal > 0 ? peVal.toFixed(2) : '--';
                 peADisplay.style.color = '#1e3a5f';
@@ -949,12 +949,12 @@
                     updateSubmitBtn();
                     return;
                 }
-                pass = pePct <= 0.30 && pbPct <= 0.30;
+                pass = pePct <= 0.35 && pbPct <= 0.35;
                 const peStr = (pePct * 100).toFixed(1);
                 const pbStr = (pbPct * 100).toFixed(1);
                 detail = pass
-                    ? `通过（PE${peStr}%≤30% 且 PB${pbStr}%≤30%）`
-                    : `未通过（PE${peStr}%或PB${pbStr}%>30%）`;
+                    ? `通过（PE${peStr}%≤35% 且 PB${pbStr}%≤35%）`
+                    : `未通过（PE${peStr}%或PB${pbStr}%>35%）`;
             } else {
                 // 绝对值模式：PE/PB自动读取，阈值手动输入
                 const peVal = selectedTarget.pe;
