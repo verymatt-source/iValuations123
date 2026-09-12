@@ -50,6 +50,11 @@
             color: #2c5282;
             font-weight: 500;
         }
+        .sync-hint {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #dc2626;
+        }
         .footer {
             text-align: center;
             padding: 24px;
@@ -331,7 +336,7 @@
             table { min-width: 900px; }
         }
     </style>
-    <script src="sub_tools/data/history_snapshot.js?v=20260911"></script>
+    <script src="sub_tools/data/history_snapshot.js?v=20260714"></script>
 </head>
 <body>
     <div class="container">
@@ -339,6 +344,7 @@
             <h1 class="page-title">投资工具箱</h1>
             <p class="page-subtitle" id="pageSubtitle">指数估值 · 财经资讯 · 数据分析</p>
             <div class="time-info" id="timeInfo"></div>
+            <div class="sync-hint">若刷新数据未更新，请检查授权码是否过期。</div>
         </div>
 
         <!-- ========== 核心概览模块 ========== -->
@@ -512,14 +518,14 @@
         </div>
     </div>
 
-    <script src="index_data_with_stars.js?v=20260911"></script>
-    <script src="sub_tools/data/pjgzb_data.js?v=20260911"></script>
-    <script src="sub_tools/data/kzzjj_data.js?v=20260911"></script>
-    <script src="sub_tools/data/usdcny_data.js?v=20260911"></script>
-    <script src="sub_tools/data/legulegu_data.js?v=20260911"></script>
-    <script src="sub_tools/data/shiller_data.js?v=20260911"></script>
-    <script src="sub_tools/data/vix_data.js?v=20260911"></script>
-    <script src="sub_tools/data/erp_data.js?v=20260911"></script>
+    <script src="index_data_with_stars.js?v=20260714"></script>
+    <script src="sub_tools/data/pjgzb_data.js?v=20260714"></script>
+    <script src="sub_tools/data/kzzjj_data.js?v=20260714"></script>
+    <script src="sub_tools/data/usdcny_data.js?v=20260714"></script>
+    <script src="sub_tools/data/legulegu_data.js?v=20260714"></script>
+    <script src="sub_tools/data/shiller_data.js?v=20260714"></script>
+    <script src="sub_tools/data/vix_data.js?v=20260714"></script>
+    <script src="sub_tools/data/erp_data.js?v=20260714"></script>
     <script>
         const data = window.indexEvaData.data.items;
         const meta = window.reportMeta || {};
